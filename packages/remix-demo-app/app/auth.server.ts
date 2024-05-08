@@ -1,4 +1,4 @@
-import { createBreezeAuth, PrismaAdapter } from "auth";
+import { createBreezeAuth, PrismaAdapter } from "@remix-breeze/auth";
 import { prisma } from "../prisma/client";
 
 const auth = createBreezeAuth({
