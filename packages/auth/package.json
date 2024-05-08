@@ -1,0 +1,37 @@
+{
+  "name": "@remix-breeze/auth",
+  "version": "0.0.0",
+  "description": "Opinionated full-fledged authentication library for Remix",
+  "type": "module",
+  "module": "build/index.js",
+  "keywords": [
+    "Remix",
+    "auth",
+    "authentication"
+  ],
+  "author": "paterson1720 <lesage1720@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "node ./__tests__/auth.test.js"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.13.0",
+    "@remix-run/node": "^2.9.1",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.12.10",
+    "bcryptjs": "^2.4.3",
+    "mongodb": "^6.6.1",
+    "typescript": "^5.4.5"
+  }
+}
