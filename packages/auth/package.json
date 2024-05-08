@@ -11,7 +11,7 @@
   ],
   "author": "paterson1720 <lesage1720@gmail.com>",
   "homepage": "",
-  "license": "ISC",
+  "license": "MIT",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "directories": {
@@ -33,5 +33,6 @@
     "bcryptjs": "^2.4.3",
     "mongodb": "^6.6.1",
     "typescript": "^5.4.5"
-  }
+  },
+  "gitHead": "cb7050d82d78d25de938357901cd64265c6b201f"
 }
