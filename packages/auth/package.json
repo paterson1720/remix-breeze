@@ -1,6 +1,6 @@
 {
   "name": "@remix-breeze/auth",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Opinionated full-fledged authentication library for Remix",
   "type": "module",
   "module": "build/index.js",
