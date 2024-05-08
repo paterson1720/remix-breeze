@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import auth from "../auth.server";
 import { Form, useActionData } from "@remix-run/react";
+import auth from "../auth.server";
 
 export const meta: MetaFunction = () => {
   return [{ title: "Register" }, { name: "description", content: "Welcome to Remix!" }];
