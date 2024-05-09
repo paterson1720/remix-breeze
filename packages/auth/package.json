@@ -6,9 +6,13 @@
   "keywords": [
     "Remix",
     "auth",
-    "authentication"
+    "authentication",
+    "remix-auth",
+    "remix-breeze-auth",
+    "remix-breeze",
+    "remix-run"
   ],
-  "author": "paterson1720 <lesage1720@gmail.com>",
+  "author": "paterson1720 <paterson.anaccius@technologeek.ca>",
   "homepage": "",
   "license": "MIT",
   "main": "build/index.js",

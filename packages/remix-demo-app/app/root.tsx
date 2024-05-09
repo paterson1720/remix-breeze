@@ -45,7 +45,7 @@ const menuItem = [
   },
   {
     name: "Admin",
-    href: "/test-admin-page",
+    href: "/admin-dashboard",
   },
 ];
 

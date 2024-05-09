@@ -8,13 +8,13 @@ export const meta: MetaFunction = () => {
 
 export async function action({ request }: ActionFunctionArgs) {
   return auth.authenticateWithCredentials(request, {
-    redirectTo: "/test-dashboard",
+    redirectTo: "/dashboard",
   });
 }
 
 export async function loader({ request }: ActionFunctionArgs) {
   return auth.redirectIfAuthenticated(request, {
-    to: "/test-dashboard",
+    to: "/dashboard",
   });
 }
 

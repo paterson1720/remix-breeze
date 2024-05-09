@@ -57,8 +57,8 @@ program
           ✅ /auth/reset-password-email-sent
           ✅ /auth/reset-password
           ✅ /auth/reset-password-success
-          ✅ /auth/test-dashboard
-          ✅ /auth/test-admin-page
+          ✅ /auth/dashboard
+          ✅ /auth/admin-dashboard
           ✅ /auth/unauthorized
         `);
 
