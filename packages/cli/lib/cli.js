@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 const { program } = require("commander");
+const path = require("path");
+const fs = require("fs");
+const { detect } = require("@antfu/ni");
 
 program
   .command("scaffold <type>")
@@ -8,22 +11,41 @@ program
   .action(async (type) => {
     switch (type) {
       case "auth":
-        console.info("Scaffolding auth...");
+        console.info("👉Remix-Breeze: Installing necessary packages...");
+        const packageManager = await getPackageManager(process.cwd());
+        const installCommand = packageManager === "npm" ? "install" : "add";
+        const installPackages = `${packageManager} ${installCommand} @remix-breeze/auth`;
+        const { execSync } = require("child_process");
+        execSync(installPackages, { stdio: "inherit" });
+
+        console.info("👉Remix-Breeze: Scaffolding auth...");
         const url =
           "https://raw.githubusercontent.com/paterson1720/remix-breeze/master/packages/remix-demo-app/public/auth-scaffold.json";
         const response = await fetch(url);
         const data = await response.json();
 
-        console.log(data);
+        const appDir = path.join(process.cwd(), "app");
+        const routesDir = path.join(appDir, "routes");
 
-        const routesDir = path.join(process.cwd(), "routes");
+        if (!fs.existsSync(appDir)) {
+          fs.mkdirSync(appDir);
+        }
+
         if (!fs.existsSync(routesDir)) {
           fs.mkdirSync(routesDir);
         }
 
-        data.forEach((item) => {
-          const filePath = path.join(routesDir, item.fileName);
-          fs.writeFileSync(filePath, item.content);
+        data.forEach((file) => {
+          const filePath = path.join(process.cwd(), file.path);
+          const fileDir = path.dirname(filePath);
+
+          if (!fs.existsSync(fileDir)) {
+            fs.mkdirSync(fileDir, {
+              recursive: true,
+            });
+          }
+
+          fs.writeFileSync(filePath, file.content);
         });
 
         console.info("Auth scaffolded successfully!");
@@ -39,15 +61,26 @@ program
           ✅ /auth/test-dashboard
           ✅ /auth/test-admin-page
           ✅ /auth/unauthorized
-        
-          Make sure you have at least a "user" role in the "Role" table in your database.
-          Then navigate to /auth/register in your browser to register a new user.
         `);
 
+        console.info(
+          `Make sure you have at least a "user" role in the "Role" table in your database. 
+           Then navigate to /auth/register in your browser to register a new user.`
+        );
         break;
       default:
-        console.log(`I don't know how to scaffoldz ${type}`);
+        console.log(`❌ Command ${type} is not a valid scaffolding command.`);
     }
   });
 
 program.parse(process.argv);
+
+async function getPackageManager(targetDir) {
+  const packageManager = await detect({ programmatic: true, cwd: targetDir });
+
+  if (packageManager === "yarn@berry") return "yarn";
+  if (packageManager === "pnpm@6") return "pnpm";
+  if (packageManager === "bun") return "bun";
+
+  return packageManager ?? "npm";
+}

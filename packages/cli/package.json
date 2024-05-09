@@ -28,6 +28,8 @@
     "test": "node ./__tests__/cli.test.js"
   },
   "dependencies": {
+    "@antfu/ni": "^0.21.12",
+    "@remix-breeze/auth": "^1.0.6",
     "commander": "^12.0.0"
   }
 }
