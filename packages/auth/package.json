@@ -30,9 +30,11 @@
     "@remix-run/node": "^2.9.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.12.10",
-    "bcryptjs": "^2.4.3",
     "mongodb": "^6.6.1",
     "typescript": "^5.4.5"
   },
-  "gitHead": "54ff60e506e5e97ccae67662f4a574dd13213fb3"
+  "gitHead": "54ff60e506e5e97ccae67662f4a574dd13213fb3",
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  }
 }
