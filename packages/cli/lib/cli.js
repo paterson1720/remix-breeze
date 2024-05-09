@@ -48,10 +48,9 @@ program
           fs.writeFileSync(filePath, file.content);
         });
 
-        console.info("Auth scaffolded successfully!");
-        console.info("The following routes were created in your project:");
-        console.info(`
-          ✅ /auth/register
+        console.info("✅ Auth scaffolded successfully!\n");
+        console.info("👉The following routes were created in your project:");
+        console.info(`✅ /auth/register
           ✅ /auth/login
           ✅ /auth/logout
           ✅ /auth/forgot-password
@@ -64,8 +63,7 @@ program
         `);
 
         console.info(
-          `Make sure you have at least a "user" role in the "Role" table in your database. 
-           Then navigate to /auth/register in your browser to register a new user.`
+          `Make sure you have at least a "user" role in the "Role" table in your database. Then navigate to /auth/register in your browser to register a new user.`
         );
         break;
       default:
