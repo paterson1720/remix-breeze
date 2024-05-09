@@ -34,7 +34,26 @@ auth.use({ type: "credentials" });
 export default auth;
 ```
 
-As you can see we are using the `PrismaAdapter` to interact with the database, make sure you setup prisma by following the official [prisma documentation](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases-typescript-postgresql) if you haven't already, and add the following models to your `schema.prisma` file:
+As you can see we are using the `PrismaAdapter` to interact with the database, make sure you setup prisma by following the official [prisma documentation](https://www.prisma.io/docs/getting-started/setup-prisma/add-to-existing-project/relational-databases-typescript-postgresql) if you haven't already.
+
+After setting up Prisma, a `prisma` folder will be created automatically in your root directory.
+
+- Create a `client.ts` file inside your `prisma` folder and paste that code in it:
+
+```ts
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+prisma.$connect();
+
+process.on("beforeExit", () => {
+  prisma.$disconnect();
+});
+
+export { prisma };
+```
+
+- Next, add the following models to your `prisma/schema.prisma` file:
 
 ```ts
 generator client {
@@ -833,3 +852,31 @@ export default function PasswordResetSuccess() {
 ```
 
 Now you have a full registration, authentication and password reset flow.
+
+## Advanced Usage (Custom Database Adapter)
+
+If you want to use a different ORM like Drizzle instead of prisma or even no ORM at all with `@remix-breeze/auth`, you can implement your own database adapter and pass it to the `createBreezeAuth`config. 
+
+To create your own adapter, refer to the implementation of the [Prisma Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/prisma.ts) or the [MongoDB Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/mongodb.ts). Re-implement all the methods to interact with your db and return the same data structure for each methods.
+
+Once you have your custom adapter, you can use it in the `createBreezeAuth` function to setup the authenticator instance like so:
+
+```ts
+import { createBreezeAuth } from "@remix-breeze/auth";
+import MyCustomAdapter from "./my-custom-adapter-fiule-path";
+
+const auth = createBreezeAuth({
+  databaseAdapter: MyCustomAdapter(),
+  cookie: {
+    name: "__session",
+    secret: process.env.COOKIE_SECRET!,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+});
+
+auth.use({ type: "credentials" });
+
+export default auth;
+```
+
+Now you are using your own adapter where you have the freedom to implement all the methods to interact with your database, an logic to verify user credentials, hash user passwords etc..
