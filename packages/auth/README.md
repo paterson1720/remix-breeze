@@ -698,7 +698,6 @@ export default function ResetPassword() {
   const actionData = useActionData<typeof action>();
   const isInvalidToken = loaderData.error;
 
-
   if (isInvalidToken) {
     return (
       <section className="bg-gray-50 dark:bg-gray-900">
@@ -788,6 +787,7 @@ export default function ResetPassword() {
 ```
 
 Focus on this code block:
+
 ```ts
 export async function action({ request }: ActionFunctionArgs) {
   return auth.resetPassword(request, {
@@ -805,7 +805,6 @@ We are using the `auth.resetPassword` and passing it the request object. This fu
 The token is the token that is included in the reset link. So it should be extracted in added to the form as a hidden input.
 
 Just by passing these fields, `auth.resetPassword` will handle reseting the user's password and redirect the user to the specified redirect URL: `/auth/reset-password-success`.
-
 
 We don't have the `/auth/reset-password-success` page yet. Let's create it.
 
@@ -855,7 +854,7 @@ Now you have a full registration, authentication and password reset flow.
 
 ## Advanced Usage (Custom Database Adapter)
 
-If you want to use a different ORM like Drizzle instead of prisma or even no ORM at all with `@remix-breeze/auth`, you can implement your own database adapter and pass it to the `createBreezeAuth`config. 
+If you want to use a different ORM like Drizzle instead of prisma or even no ORM at all with `@remix-breeze/auth`, you can implement your own database adapter and pass it to the `createBreezeAuth`config.
 
 To create your own adapter, refer to the implementation of the [Prisma Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/prisma.ts) or the [MongoDB Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/mongodb.ts). Re-implement all the methods to interact with your db and return the same data structure for each methods.
 
@@ -879,4 +878,4 @@ auth.use({ type: "credentials" });
 export default auth;
 ```
 
-Now you are using your own adapter where you have the freedom to implement all the methods to interact with your database, an logic to verify user credentials, hash user passwords etc..
+Now you are using your own adapter where you have the freedom to implement all the methods to interact with your database, and logic to verify user credentials, hash user passwords etc..

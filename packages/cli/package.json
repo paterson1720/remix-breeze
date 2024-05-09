@@ -1,0 +1,33 @@
+{
+  "name": "@remix-breeze/cli",
+  "version": "0.0.0",
+  "description": "The remix-breeze cli to scaffold project features",
+  "keywords": [
+    "remix",
+    "remix-breeze"
+  ],
+  "author": "paterson1720 <lesage1720@gmail.com>",
+  "homepage": "",
+  "license": "MIT",
+  "main": "lib/cli.js",
+  "bin": {
+    "@remix-breeze/cli": "lib/cli.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-paterson1720:paterson1720/remix-breeze.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/cli.test.js"
+  },
+  "dependencies": {
+    "commander": "^12.0.0"
+  }
+}
