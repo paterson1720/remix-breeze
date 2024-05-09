@@ -19,7 +19,8 @@
     "test": "__tests__"
   },
   "files": [
-    "lib"
+    "lib",
+    "build"
   ],
   "scripts": {
     "build": "tsc --project tsconfig.json",
