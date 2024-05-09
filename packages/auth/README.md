@@ -2,11 +2,21 @@
 
 > Add authentication to your Remix app like a breeze.
 
+Follow us on [X (Twitter)](https://twitter.com/Paterson1720) to stay in touch and get update when new tools are released.
+
 **@remix-breeze/auth** is an easy to use library with an elegant API to easily add email/password based authentication to your Remix apps.
 
-## Getting started tutorial
+## Getting started
 
-- Create a [Remix](https://remix.run/) app if you don't have one already
+Choose one of the options below to get started.
+
+## Starting a new Remix project ?
+
+If you are starting a new Remix project, the easiest way is to use the [Remix-Breeze Starter Template](https://github.com/paterson1720/remix-breeze-starter). It's a simple and easy to use starter template built to get your project started quickly with **@remix-breeze/auth** and Remix.
+
+## Existing project ?
+
+If you have an existing project and you want to add authentication to it, following this tutorial to add a full authentication flow to your app. This tutorial assumes your app is using Prisma ORM and Tailwindcss. If you are not using Prisma, you can still follow along, but you'll need to [configure your own adapter](#advanced-usage-custom-database-adapter).
 
 - Install the library in your Remix app
 
@@ -852,9 +862,13 @@ export default function PasswordResetSuccess() {
 
 Now you have a full registration, authentication and password reset flow.
 
-## Advanced Usage (Custom Database Adapter)
+## Advanced Usage
 
-If you want to use a different ORM like Drizzle instead of prisma or even no ORM at all with `@remix-breeze/auth`, you can implement your own database adapter and pass it to the `createBreezeAuth`config.
+The default flow and setups will work with most apps, but if you want more control, @remix-breeze/auth allows you to provide your own adapter, sessionStorage to have full control on your authentication logic and database interaction.
+
+## Provide a Custom Database Adapter
+
+If you want to use a different ORM like Drizzle instead of prisma or even no ORM at all with `@remix-breeze/auth`, you can implement your own database adapter and pass it to the `createBreezeAuth` configuration options.
 
 To create your own adapter, refer to the implementation of the [Prisma Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/prisma.ts) or the [MongoDB Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/mongodb.ts). Re-implement all the methods to interact with your db and return the same data structure for each methods.
 
