@@ -1,12 +1,18 @@
-import crypto from "crypto";
-import bcrypt from "bcryptjs";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PrismaAdapter = void 0;
+const crypto_1 = __importDefault(require("crypto"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 function comparePasswordToHashedPassword(password, hashedPassword) {
-    return bcrypt.compare(password, hashedPassword);
+    return bcryptjs_1.default.compare(password, hashedPassword);
 }
 function hashUserPassword(password) {
-    return bcrypt.hash(password, 10);
+    return bcryptjs_1.default.hash(password, 10);
 }
-export function PrismaAdapter(client) {
+function PrismaAdapter(client) {
     const prisma = client;
     function validateEmail(email) {
         // simple email validation - must contain @ and a dot
@@ -234,7 +240,7 @@ export function PrismaAdapter(client) {
             };
         },
         async generatePasswordResetToken(email, options) {
-            const token = crypto.randomBytes(32).toString("hex");
+            const token = crypto_1.default.randomBytes(32).toString("hex");
             const existingRequest = await prisma.verificationRequest.findFirst({
                 where: {
                     identifier: email,
@@ -318,3 +324,4 @@ export function PrismaAdapter(client) {
         },
     };
 }
+exports.PrismaAdapter = PrismaAdapter;

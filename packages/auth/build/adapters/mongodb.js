@@ -1,6 +1,12 @@
-import crypto from "crypto";
-import bcrypt from "bcryptjs";
-export function MongoDBAdapter(getClient) {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MongoDBAdapter = void 0;
+const crypto_1 = __importDefault(require("crypto"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
+function MongoDBAdapter(getClient) {
     async function db() {
         const client = await getClient();
         const db = client.db();
@@ -10,10 +16,10 @@ export function MongoDBAdapter(getClient) {
         };
     }
     async function hashUserPassword(password) {
-        return bcrypt.hash(password, 10);
+        return bcryptjs_1.default.hash(password, 10);
     }
     async function comparePasswordToHashedPassword(password, hashedPassword) {
-        return bcrypt.compare(password, hashedPassword);
+        return bcryptjs_1.default.compare(password, hashedPassword);
     }
     function validateEmail(email) {
         // simple email validation - must contain @ and a dot
@@ -166,7 +172,7 @@ export function MongoDBAdapter(getClient) {
         };
     }
     async function generatePasswordResetToken(email, options) {
-        const token = crypto.randomBytes(32).toString("hex");
+        const token = crypto_1.default.randomBytes(32).toString("hex");
         const { Verification } = await db();
         const existingRequest = await Verification.findOne({
             identifier: email,
@@ -278,3 +284,4 @@ export function MongoDBAdapter(getClient) {
         validatePasswordResetToken,
     };
 }
+exports.MongoDBAdapter = MongoDBAdapter;

@@ -1,4 +1,7 @@
-import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createBreezeAuth = void 0;
+const node_1 = require("@remix-run/node");
 /**
  * -----------------------------------------
  * createBreezeAuth
@@ -21,7 +24,7 @@ import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
  * });
  * ```
  */
-export function createBreezeAuth(breezeAuthOptions) {
+function createBreezeAuth(breezeAuthOptions) {
     let sessionStorage;
     if ("sessionStorage" in breezeAuthOptions) {
         sessionStorage = breezeAuthOptions.sessionStorage;
@@ -33,7 +36,7 @@ export function createBreezeAuth(breezeAuthOptions) {
         }
         const thirtyDaysInSeconds = 30 * 24 * 60 * 60;
         const defaultCookieMaxAge = breezeAuthOptions.cookie.maxAge || thirtyDaysInSeconds;
-        sessionStorage = createCookieSessionStorage({
+        sessionStorage = (0, node_1.createCookieSessionStorage)({
             cookie: {
                 name: "__breeze-auth-session__",
                 secrets: [cookieSecret],
@@ -129,7 +132,7 @@ export function createBreezeAuth(breezeAuthOptions) {
          */
         async logout(request, options) {
             const session = await this.getSession(request);
-            return redirect(options.redirectTo, {
+            return (0, node_1.redirect)(options.redirectTo, {
                 headers: {
                     "Set-Cookie": await sessionStorage.destroySession(session),
                 },
@@ -170,7 +173,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             if (!options.authenticateAndRedirectTo)
                 return registration;
             if (registration.error) {
-                return json({
+                return (0, node_1.json)({
                     user: null,
                     error: {
                         message: registration.error.message,
@@ -181,7 +184,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             const session = await this.getSession(request);
             session.set("user", registration.user);
             session.set("metadata", { userAgent: String(request.headers.get("User-Agent")) });
-            return redirect(options.authenticateAndRedirectTo, {
+            return (0, node_1.redirect)(options.authenticateAndRedirectTo, {
                 headers: await this.getCommittedSessionHeaders(session),
             });
         },
@@ -220,7 +223,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             session.set("user", options.data.user);
             sessionStorage.commitSession(session);
             if (options.redirectTo) {
-                return redirect(options.redirectTo, {
+                return (0, node_1.redirect)(options.redirectTo, {
                     headers: await this.getCommittedSessionHeaders(session),
                 });
             }
@@ -246,7 +249,7 @@ export function createBreezeAuth(breezeAuthOptions) {
         async requireRole(request, role, options) {
             const sessionUser = await this.getUserFromSession(request);
             if (!sessionUser || !sessionUser.roles.includes(role)) {
-                throw redirect(options.redirectTo);
+                throw (0, node_1.redirect)(options.redirectTo);
             }
             return sessionUser;
         },
@@ -289,14 +292,14 @@ export function createBreezeAuth(breezeAuthOptions) {
             const sessionUser = session.get("user");
             const isCustomSessionStorage = "sessionStorage" in breezeAuthOptions;
             if (!sessionUser && !isCustomSessionStorage) {
-                throw redirect(options.ifNotAuthenticatedRedirectTo, {
+                throw (0, node_1.redirect)(options.ifNotAuthenticatedRedirectTo, {
                     headers: {
                         "Set-Cookie": await sessionStorage.destroySession(session),
                     },
                 });
             }
             else if (!sessionUser) {
-                throw redirect(options.ifNotAuthenticatedRedirectTo);
+                throw (0, node_1.redirect)(options.ifNotAuthenticatedRedirectTo);
             }
             if (options.withRoles?.length) {
                 for (const role of options.withRoles) {
@@ -392,7 +395,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
             const redirectTo = new URL(options.onSuccessRedirectTo, baseUrl);
             redirectTo.searchParams.set("email", encodeURIComponent(resetPasswordResult.user.email));
-            return redirect(redirectTo.toString());
+            return (0, node_1.redirect)(redirectTo.toString());
         },
         /**
          * -----------------------------------------
@@ -414,7 +417,7 @@ export function createBreezeAuth(breezeAuthOptions) {
         async requireAllRoles(request, roles, options) {
             const sessionUser = await this.getUserFromSession(request);
             if (!sessionUser || !roles.every((role) => sessionUser.roles.includes(role))) {
-                throw redirect(options.redirectTo);
+                throw (0, node_1.redirect)(options.redirectTo);
             }
             return sessionUser;
         },
@@ -438,7 +441,7 @@ export function createBreezeAuth(breezeAuthOptions) {
         async requireSomeRoles(request, roles, options) {
             const sessionUser = await this.getUserFromSession(request);
             if (!sessionUser || !roles.some((role) => sessionUser.roles.includes(role))) {
-                throw redirect(options.redirectTo);
+                throw (0, node_1.redirect)(options.redirectTo);
             }
             return sessionUser;
         },
@@ -553,7 +556,7 @@ export function createBreezeAuth(breezeAuthOptions) {
                 expiresAfterMinutes: options?.expireLinkAfterMinutes,
             });
             if (generateTokenResult.error) {
-                return json({
+                return (0, node_1.json)({
                     error: {
                         message: generateTokenResult.error.message,
                         code: generateTokenResult.error.code,
@@ -573,7 +576,7 @@ export function createBreezeAuth(breezeAuthOptions) {
                 resetLink,
             });
             if (sendMailResult.error) {
-                return json({
+                return (0, node_1.json)({
                     error: {
                         message: sendMailResult.error.message,
                         code: sendMailResult.error.code,
@@ -584,7 +587,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
             const redirectTo = new URL(options.onSuccessRedirectTo, baseUrl);
             redirectTo.searchParams.set("email", encodeURIComponent(email));
-            return redirect(redirectTo.toString());
+            return (0, node_1.redirect)(redirectTo.toString());
         },
         /**
          * -----------------------------------------
@@ -607,7 +610,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             const session = await this.getSession(request);
             const isAuthenticated = session.get("user");
             if (isAuthenticated)
-                throw redirect(options.to);
+                throw (0, node_1.redirect)(options.to);
             return session;
         },
         /**
@@ -696,7 +699,7 @@ export function createBreezeAuth(breezeAuthOptions) {
                 password: formEntries.password,
             };
             if (!validateEmail(credentials.email)) {
-                return json({
+                return (0, node_1.json)({
                     error: {
                         message: "Invalid email address",
                         code: "invalid_email",
@@ -705,7 +708,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             }
             for (const [key, value] of Object.entries(credentials)) {
                 if (!value.trim()) {
-                    return json({
+                    return (0, node_1.json)({
                         error: {
                             message: `${key} is required`,
                             code: `${key}_required`,
@@ -716,7 +719,7 @@ export function createBreezeAuth(breezeAuthOptions) {
             const { user, error } = await dbAdapter.loginUser(credentials);
             const session = await this.getSession(request);
             if (error) {
-                return json({
+                return (0, node_1.json)({
                     error: {
                         message: error.message,
                         code: error.code,
@@ -725,9 +728,10 @@ export function createBreezeAuth(breezeAuthOptions) {
             }
             session.set("user", user);
             session.set("metadata", { userAgent: String(request.headers.get("User-Agent")) });
-            return redirect(options.redirectTo, {
+            return (0, node_1.redirect)(options.redirectTo, {
                 headers: await this.getCommittedSessionHeaders(session),
             });
         },
     };
 }
+exports.createBreezeAuth = createBreezeAuth;
