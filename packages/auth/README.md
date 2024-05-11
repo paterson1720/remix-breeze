@@ -1,10 +1,17 @@
 # `@remix-breeze/auth`
 
-> Add authentication to your Remix app like a breeze.
+> Add email/password authentication to your Remix app like a breeze.
 
 Follow us on [X (Twitter)](https://twitter.com/Paterson1720) to stay in touch and get update when new tools are released.
 
 **@remix-breeze/auth** is an easy to use library with an elegant API to easily add email/password based authentication to your Remix apps.
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+- [Advanced Usage](#advanced-usage)
+- [API reference](#api-reference)
+- [Types](#types)
 
 ## Getting started
 
@@ -893,3 +900,397 @@ export default auth;
 ```
 
 Now you are using your own adapter where you have the freedom to implement all the methods to interact with your database, and logic to verify user credentials, hash user passwords etc..
+
+## API Reference
+
+Remix-Breeze Auth is a flexible authentication library designed for use with Remix. This documentation provides a detailed reference for initializing the library, managing sessions, user authentication, and handling specific authentication scenarios.
+
+## Setup
+
+Before using BreezeAuth, you must set up and configure the library. Use the `createBreezeAuth` function to initialize an instance with your specific configuration.
+
+### createBreezeAuth
+
+```typescript
+import { createBreezeAuth } from "./breeze-auth";
+import { PrismaAdapter } from "./breeze-auth/adapters/prisma-adapter";
+import { prisma } from "prisma/client";
+
+const auth = createBreezeAuth({
+  databaseAdapter: PrismaAdapter(prisma),
+  cookie: {
+    name: "__breeze-auth-session__",
+    secret: process.env.COOKIE_SECRET,
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+});
+```
+
+Parameters:
+
+- `breezeAuthOptions`: Configuration options for setting up BreezeAuth.
+
+## Core Functions
+
+Below are the core functions provided by the BreezeAuth instance.
+
+### sessionStorage
+
+Manage user sessions, including retrieval, commitment, and destruction of session data.
+
+```ts
+const session = await auth.sessionStorage.getSession(request);
+session.set("user", { id: 1, email: "test@email.com" });
+await auth.sessionStorage.commitSession(session);
+await auth.sessionStorage.destroySession(session);
+```
+
+### use
+
+Register an authentication provider.
+
+```typescript
+auth.use({
+  type: "credentials",
+  sendResetPasswordEmail: async ({ user, resetLink }) => {
+    // implementation
+  },
+  resetPasswordPageUrl: "/auth/reset-password",
+});
+```
+
+### logout
+
+Log out a user and clear session data.
+
+```typescript
+await auth.logout(request, { redirectTo: "/auth/login" });
+```
+
+### getSession
+
+Retrieve the session from a request.
+
+```typescript
+const session = await auth.getSession(request);
+```
+
+### registerUser
+
+Register a new user.
+
+```typescript
+const registration = await auth.registerUser(request, {
+  authenticateAndRedirectTo: "/dashboard",
+});
+```
+
+### requireAuth
+
+Require authentication for a route.
+
+```typescript
+const session = await auth.requireAuth(request, {
+  ifNotAuthenticatedRedirectTo: "/auth/login",
+});
+```
+
+### resetPassword
+
+Reset a user's password.
+
+```typescript
+await auth.resetPassword(request, {
+  onSuccessRedirectTo: "/auth/reset-password-success",
+});
+```
+
+### requireRole
+
+Require a specific user role to access a route.
+
+```typescript
+await auth.requireRole(request, "admin", {
+  redirectTo: "/auth/unauthorized",
+});
+```
+
+### redirectIfAuthenticated
+
+Redirect already authenticated users.
+
+```typescript
+await auth.redirectIfAuthenticated(request, {
+  to: "/dashboard",
+});
+```
+
+### Miscellaneous Functions
+
+- `updateSession`: Update session data and potentially redirect.
+- `getUserFromSession`: Retrieve user data from the session.
+- `sendPasswordResetLink`: Send a password reset link to a user's email.
+- `getCommittedSessionHeaders`: Get the Set-Cookie headers after committing a session.
+
+## Database Adapter
+
+BreezeAuth requires a database adapter to interface with your database. The adapter should conform to a specific interface, handling user creation, authentication, password resets, etc.
+The library provides a Prisma Adapter and a MongoDB Adapter by default, you can create your own adapter by looking at one of the adapters source code as example.
+
+- [Prisma Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/prisma.ts)
+- [MongoDB Adapter](https://github.com/paterson1720/remix-breeze/blob/main/packages/auth/lib/adapters/mongodb.ts)
+
+## Types
+
+````ts
+import { SessionStorage } from "@remix-run/node";
+
+export interface BreezeAuthUser {
+  id: string;
+  email: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  avatar: string | null;
+  emailVerified: boolean;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+  roles: string[];
+}
+
+export type BreezeAuthSessionUser = Omit<BreezeAuthUser, "password" | "createdAt" | "updatedAt">;
+
+export type ExtendedBreezeAuthSessionUser<T = object> = BreezeAuthSessionUser & T;
+
+export interface BreezeAuthSessionFlashData {
+  error: {
+    message: string;
+    code: string;
+  };
+}
+
+export interface CreateBreezeAuthOptions<T> {
+  /**
+   * The database adapter to use for BreezeAuth to interact with the database
+   * @example
+   * ```ts
+   * import { PrismaAdapter } from "./breeze-auth/adapters/prisma-adapter";
+   * import { prisma } from "prisma/client";
+   *
+   * const auth = createBreezeAuth({
+   *   databaseAdapter: PrismaAdapter(prisma),
+   *   // other options
+   * });
+   * ```
+   */
+  databaseAdapter: DatabaseAdapter<T>;
+  /**
+   * The cookie configuration for the session
+   * @example
+   * ```ts
+   * const auth = createBreezeAuth({
+   *   cookie: {
+   *     name: "__breeze-auth-session__",
+   *     secret: process.env.COOKIE_SECRET,
+   *     maxAge: 30 * 24 * 60 * 60, // 30 days
+   *   },
+   *  // other options
+   * });
+   * ```
+   */
+  cookie: {
+    name: string;
+    secret: string;
+    maxAge: number;
+    httpOnly?: boolean;
+    secure?: boolean;
+    sameSite?: "lax" | "strict" | "none";
+  };
+}
+
+export interface CreateBreezeAuthWithCustomSessionStorageOptions<T> {
+  /**
+   * The database adapter to use for BreezeAuth to interact with the database
+   * @example
+   * ```ts
+   * import { PrismaAdapter } from "./breeze-auth/adapters/prisma-adapter";
+   * import { prisma } from "prisma/client";
+   *
+   * const auth = createBreezeAuth({
+   *   databaseAdapter: PrismaAdapter(prisma),
+   *   // other options
+   * });
+   * ```
+   */
+  databaseAdapter: DatabaseAdapter<T>;
+  /**
+   * A custom session storage to use for BreezeAuth if you want to use a different session storage
+   * other than the default cookie session storage.
+   * @example
+   * ```ts
+   * import { createDatabaseSessionStorage } from "./breeze-auth/session-storage";
+   *
+   * const auth = createBreezeAuth({
+   *   databaseAdapter: PrismaAdapter(prisma),
+   *   sessionStorage: createDatabaseSessionStorage({
+   *     cookie: {
+   *       name: "__session",
+   *       maxAge: 30 * 24 * 60 * 60,
+   *       httpOnly: true,
+   *       sameSite: "lax",
+   *       secure: process.env.NODE_ENV === "production",
+   *     },
+   *   }),
+   * });
+   * ```
+   */
+  sessionStorage: SessionStorage<
+    { user: ExtendedBreezeAuthSessionUser<T> },
+    BreezeAuthSessionFlashData
+  >;
+}
+
+export type RequireAuthOptions = {
+  /**
+   * The URL to redirect to if the user is not authenticated
+   * Example: /auth/login
+   */
+  ifNotAuthenticatedRedirectTo: string;
+  /**
+   * The roles required to access the page
+   * By default, any authenticated user can access the page
+   */
+  withRoles?: string[];
+  /**
+   * The URL to redirect to if the user is authenticated but not authorized to access the page
+   * Example: /auth/unauthorized
+   */
+  ifNotAuthorizedRedirectTo?: string;
+};
+
+export interface RequireRoleOptions {
+  /**
+   * The URL to redirect to if the user does not have the required role to access the page
+   * Default: /auth/unauthorized
+   */
+  redirectTo: string;
+}
+
+export interface BreezeAuthProvider {
+  /**
+   * The type of the authentication provider.
+   * Example: "credentials"
+   */
+  type: "credentials";
+  /**
+   * The URL to your password reset page. This is used to redirect the user to the password reset page
+   * when they click the reset password link in the password reset email.
+   *
+   * Example: /auth/reset-password
+   */
+  resetPasswordPageUrl?: string;
+  /**
+   * A function that sends a password reset email to the user.
+   * @param options - The options object containing the user's email and the password reset link.
+   * @param options.user - The user object containing the user's id and email.
+   * @param options.resetLink - The password reset link that the user can click to reset their password.
+   * @returns An object containing an error flag and an optional message.
+   */
+  sendResetPasswordEmail?: (options: {
+    user: { id: string; email: string; firstName?: string; lastName?: string };
+    resetLink: string;
+  }) => Promise<{
+    error: {
+      message: string;
+      code: string;
+      meta?: object;
+    } | null;
+  }>;
+}
+
+/*
+ * Database Adapter
+ */
+export interface UserCredentials {
+  email: string;
+  password: string;
+}
+
+export interface ErrorObject {
+  message: string;
+  code: string;
+  meta?: object;
+}
+
+export interface UserDataSuccess<T> {
+  user: T;
+  error: null;
+}
+
+export interface UserDataError {
+  user: null;
+  error: ErrorObject;
+}
+
+export interface TokenDataSuccess {
+  error: null;
+  token: string;
+}
+
+export interface TokenDataError {
+  error: ErrorObject;
+  token: null;
+}
+
+export interface TokenValidationSuccess {
+  error: null;
+  tokenData: {
+    token: string;
+    identifier: string;
+    type: string;
+    expires: Date | string;
+  };
+}
+
+export interface TokenValidationError {
+  error: ErrorObject;
+  tokenData: null;
+}
+
+export interface DatabaseAdapter<T> {
+  getUserByEmail: (email: string) => Promise<UserDataSuccess<T> | UserDataError>;
+  loginUser: (credentials: UserCredentials) => Promise<UserDataSuccess<T> | UserDataError>;
+  registerUser: (request: Request) => Promise<UserDataSuccess<T> | UserDataError>;
+  /**
+   * -----------------------------------------
+   * generatePasswordResetToken
+   * -----------------------------------------
+   * Generate a password reset token for the user.
+   * @param email - The user's email address
+   * @param options - The options object
+   * @param options.expiresAfterMinutes - After how many minutes the token should expire
+   * @returns An object containing the token or an error object with a message and code if an error occurred
+   */
+  generatePasswordResetToken: (
+    email: string,
+    options: { expiresAfterMinutes: number }
+  ) => Promise<TokenDataSuccess | TokenDataError>;
+  deletePasswordResetToken: (token: string) => Promise<{ error: ErrorObject | null }>;
+  validatePasswordResetToken: (
+    token: string
+  ) => Promise<TokenValidationSuccess | TokenValidationError>;
+  resetUserPassword: (options: {
+    token: string;
+    newPassword: string;
+  }) => Promise<UserDataError | UserDataSuccess<T>>;
+}
+````
+
+## Error Handling
+
+Errors are handles by returning an `error` object with `message` and `code` properties when there is an error in each adapter function, the UI can access the error message and code and provide detailed error message to the user.
+
+## Conclusion
+
+Remix-Breeze Auth provides comprehensive tools for managing user authentication and session management efficiently. By configuring it according to your application's needs, you can implement robust auth processes tailored to your requirements.

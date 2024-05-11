@@ -19,10 +19,10 @@
   "types": "build/index.d.ts",
   "directories": {
     "lib": "lib",
+    "build": "build",
     "test": "__tests__"
   },
   "files": [
-    "lib",
     "build"
   ],
   "scripts": {
