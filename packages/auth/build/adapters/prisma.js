@@ -242,6 +242,13 @@ function PrismaAdapter(client) {
         async changeUserPassword({ userId, currentPassword, newPassword }) {
             const user = await prisma.user.findUnique({
                 where: { id: userId },
+                include: {
+                    roles: {
+                        include: {
+                            role: true,
+                        },
+                    },
+                },
             });
             if (!user) {
                 return {
