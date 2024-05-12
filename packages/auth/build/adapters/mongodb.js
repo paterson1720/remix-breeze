@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoDBAdapter = void 0;
 const crypto_1 = __importDefault(require("crypto"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const mongodb_1 = require("mongodb");
 function MongoDBAdapter(getClient) {
     async function db() {
         const client = await getClient();
@@ -260,6 +261,53 @@ function MongoDBAdapter(getClient) {
             },
         };
     }
+    async function changeUserPassword({ userId, currentPassword, newPassword, }) {
+        const { User } = await db();
+        const user = await User.findOne({ _id: new mongodb_1.ObjectId(userId) });
+        if (!user) {
+            return {
+                user: null,
+                error: {
+                    message: "User not found",
+                    code: "user_not_found",
+                },
+            };
+        }
+        const isValidPassword = await comparePasswordToHashedPassword(currentPassword, user.password);
+        if (!isValidPassword) {
+            return {
+                user: null,
+                error: {
+                    message: "Invalid current password",
+                    code: "invalid_current_password",
+                },
+            };
+        }
+        const hashedPassword = await hashUserPassword(newPassword);
+        const updatedUser = await User.findOneAndUpdate({ _id: new mongodb_1.ObjectId(user._id) }, { $set: { password: hashedPassword } }, { returnDocument: "after" });
+        if (!updatedUser) {
+            return {
+                user: null,
+                error: {
+                    message: "User not found",
+                    code: "user_not_found",
+                },
+            };
+        }
+        return {
+            error: null,
+            user: {
+                id: updatedUser._id.toHexString(),
+                avatar: updatedUser.avatar,
+                email: updatedUser.email,
+                fullName: updatedUser.fullName,
+                firstName: updatedUser.firstName,
+                lastName: updatedUser.lastName,
+                emailVerified: updatedUser.emailVerified,
+                roles: updatedUser.roles,
+            },
+        };
+    }
     async function deletePasswordResetToken(token) {
         const { Verification } = await db();
         const verificationRequest = await Verification.findOne({ token, type: "password_reset" });
@@ -279,6 +327,7 @@ function MongoDBAdapter(getClient) {
         registerUser,
         getUserByEmail,
         resetUserPassword,
+        changeUserPassword,
         deletePasswordResetToken,
         generatePasswordResetToken,
         validatePasswordResetToken,

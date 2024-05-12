@@ -239,6 +239,59 @@ function PrismaAdapter(client) {
                 },
             };
         },
+        async changeUserPassword({ userId, currentPassword, newPassword }) {
+            const user = await prisma.user.findUnique({
+                where: { id: userId },
+            });
+            if (!user) {
+                return {
+                    user: null,
+                    error: {
+                        message: "User not found",
+                        code: "user_not_found",
+                    },
+                };
+            }
+            const isValidPassword = await comparePasswordToHashedPassword(currentPassword, user.password);
+            if (!isValidPassword) {
+                return {
+                    user: null,
+                    error: {
+                        message: "Invalid current password",
+                        code: "invalid_password",
+                    },
+                };
+            }
+            if (!validatePassword(newPassword)) {
+                return {
+                    user: null,
+                    error: {
+                        message: "Password must contain letters and numbers and be at least 6 characters long",
+                        code: "invalid_password",
+                    },
+                };
+            }
+            const hashedPassword = await hashUserPassword(newPassword);
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    password: hashedPassword,
+                },
+            });
+            return {
+                error: null,
+                user: {
+                    id: user.id,
+                    avatar: user.avatar,
+                    email: user.email,
+                    fullName: user.fullName,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    emailVerified: user.emailVerified,
+                    roles: user.roles.map((item) => item.role.name),
+                },
+            };
+        },
         async generatePasswordResetToken(email, options) {
             const token = crypto_1.default.randomBytes(32).toString("hex");
             const existingRequest = await prisma.verificationRequest.findFirst({

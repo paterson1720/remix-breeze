@@ -249,6 +249,29 @@ export declare function createBreezeAuth<T extends BreezeAuthSessionUser>(breeze
     }>;
     /**
      * -----------------------------------------
+     * changePassword
+     * -----------------------------------------
+     * Change the user's password
+     * @param userId - The user's ID
+     * @param currentPassword - The user's current password
+     * @param newPassword - The user's new password
+     * @returns An object with the error message and code if an error occurs. Otherwise, the user's data will be returned.
+     * @example
+     * ```ts
+     * const {user, error} = await auth.changePassword({
+     *  userId: 1,
+     *  currentPassword: "currentPassword",
+     *  newPassword: "newPassword",
+     * });
+     * ```
+     */
+    changePassword({ userId, currentPassword, newPassword, }: {
+        userId: string | number;
+        currentPassword: string;
+        newPassword: string;
+    }): Promise<import("./types").UserDataError | import("./types").UserDataSuccess<T>>;
+    /**
+     * -----------------------------------------
      * requireAllRoles
      * -----------------------------------------
      * Require all the specified roles to access a page. If the user does not have all the required roles,
