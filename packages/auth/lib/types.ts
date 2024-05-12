@@ -239,4 +239,9 @@ export interface DatabaseAdapter<T> {
     token: string;
     newPassword: string;
   }) => Promise<UserDataError | UserDataSuccess<T>>;
+  changeUserPassword: (options: {
+    userId: string | number;
+    currentPassword: string;
+    newPassword: string;
+  }) => Promise<UserDataError | UserDataSuccess<T>>;
 }

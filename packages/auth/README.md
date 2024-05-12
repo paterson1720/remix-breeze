@@ -901,6 +901,99 @@ export default auth;
 
 Now you are using your own adapter where you have the freedom to implement all the methods to interact with your database, and logic to verify user credentials, hash user passwords etc..
 
+## Provide a Custom Session Storage
+
+By default, Remix-Breeze Auth uses cookie to store session data. If you want to store session
+data in your database, you can provide a custom session storage in the `createBreezeAuth`
+function options.
+
+Here is an example of how you can store session data in a database.
+This example uses MongoDB as the database but you can adapt it to use any other database.
+
+```ts
+import { SessionIdStorageStrategy, createSessionStorage } from "@remix-run/node";
+import { ObjectId } from "mongodb";
+import { BreezeAuthSessionUser } from "./breeze-auth/types";
+
+function createDatabaseSessionStorage({ cookie }: { cookie: SessionIdStorageStrategy["cookie"] }) {
+  // Configure your database client...
+  async function db() {
+    const dbClient = await getMongoClient();
+    const db = dbClient.db();
+    return {
+      Session: db.collection("Session"),
+    };
+  }
+
+  return createSessionStorage<{ user: BreezeAuthSessionUser }>({
+    cookie,
+    async createData(data, expires) {
+      // `expires` is a Date after which the data should be considered
+      // invalid. You could use it to invalidate the data somehow or
+      // automatically purge this record from your database.
+      const { Session } = await db();
+      const { insertedId } = await Session.insertOne({
+        data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        expires,
+      });
+
+      return insertedId.toHexString();
+    },
+    async readData(id) {
+      const { Session } = await db();
+      const session = await Session.findOne({ _id: new ObjectId(id) });
+
+      if (!session) {
+        return null;
+      }
+
+      return session.data;
+    },
+    async updateData(id, data, expires) {
+      const { Session } = await db();
+      await Session.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            data,
+            updatedAt: new Date(),
+            expires,
+          },
+        }
+      );
+    },
+    async deleteData(id) {
+      const { Session } = await db();
+      await Session.deleteOne({ _id: new ObjectId(id) });
+    },
+  });
+}
+
+export default createDatabaseSessionStorage;
+```
+
+Now in your `auth.server.ts` file you can use the `createDatabaseSessionStorage`to create a custom session storage and pass it to the `createBreezeAuth` function options.
+
+```ts
+import { createBreezeAuth, MongoDBAdapter } from "@remix-breeze/auth";
+import { getMongoClient } from "./mongo-client";
+
+const breezeAuth = createBreezeAuth({
+  databaseAdapter: MongoDBAdapter(getMongoClient),
+  sessionStorage: createDatabaseSessionStorage({
+    cookie: {
+      name: "__session",
+      maxAge: 30 * 24 * 60 * 60,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    },
+  }),
+});
+```
+
 ## API Reference
 
 Remix-Breeze Auth is a flexible authentication library designed for use with Remix. This documentation provides a detailed reference for initializing the library, managing sessions, user authentication, and handling specific authentication scenarios.
@@ -912,8 +1005,7 @@ Before using BreezeAuth, you must set up and configure the library. Use the `cre
 ### createBreezeAuth
 
 ```typescript
-import { createBreezeAuth } from "./breeze-auth";
-import { PrismaAdapter } from "./breeze-auth/adapters/prisma-adapter";
+import { createBreezeAuth, PrismaAdapter } from "@remix-breeze/auth";
 import { prisma } from "prisma/client";
 
 const auth = createBreezeAuth({
@@ -1022,6 +1114,18 @@ Redirect already authenticated users.
 ```typescript
 await auth.redirectIfAuthenticated(request, {
   to: "/dashboard",
+});
+```
+
+### changePassword
+
+Change the user password
+
+```typescript
+const { user, error } = await auth.changeUserPassword({
+  userId: "1",
+  currentPassword: "password",
+  newPassword: "M@res3cur3password",
 });
 ```
 
@@ -1282,6 +1386,11 @@ export interface DatabaseAdapter<T> {
   ) => Promise<TokenValidationSuccess | TokenValidationError>;
   resetUserPassword: (options: {
     token: string;
+    newPassword: string;
+  }) => Promise<UserDataError | UserDataSuccess<T>>;
+  changeUserPassword: (options: {
+    userId: string;
+    currentPassword: string;
     newPassword: string;
   }) => Promise<UserDataError | UserDataSuccess<T>>;
 }

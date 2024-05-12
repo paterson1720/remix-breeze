@@ -466,6 +466,41 @@ export function createBreezeAuth<T extends BreezeAuthSessionUser>(
     },
     /**
      * -----------------------------------------
+     * changePassword
+     * -----------------------------------------
+     * Change the user's password
+     * @param userId - The user's ID
+     * @param currentPassword - The user's current password
+     * @param newPassword - The user's new password
+     * @returns An object with the error message and code if an error occurs. Otherwise, the user's data will be returned.
+     * @example
+     * ```ts
+     * const {user, error} = await auth.changePassword({
+     *  userId: 1,
+     *  currentPassword: "currentPassword",
+     *  newPassword: "newPassword",
+     * });
+     * ```
+     */
+    async changePassword({
+      userId,
+      currentPassword,
+      newPassword,
+    }: {
+      userId: string | number;
+      currentPassword: string;
+      newPassword: string;
+    }) {
+      const providerConfig = providers.find((provider) => provider.type === "credentials");
+
+      if (!providerConfig) {
+        throw new Error(`BreezeAuth: No credentials provider found in the configuration`);
+      }
+
+      return dbAdapter.changeUserPassword({ userId, currentPassword, newPassword });
+    },
+    /**
+     * -----------------------------------------
      * requireAllRoles
      * -----------------------------------------
      * Require all the specified roles to access a page. If the user does not have all the required roles,

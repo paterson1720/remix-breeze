@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { BreezeAuthSessionUser, BreezeAuthUser, DatabaseAdapter } from "../types";
 
 type User = Omit<BreezeAuthUser, "id">;
@@ -309,6 +309,72 @@ export function MongoDBAdapter(
     };
   }
 
+  async function changeUserPassword({
+    userId,
+    currentPassword,
+    newPassword,
+  }: {
+    userId: string | number;
+    currentPassword: string;
+    newPassword: string;
+  }) {
+    const { User } = await db();
+
+    const user = await User.findOne({ _id: new ObjectId(userId) });
+    if (!user) {
+      return {
+        user: null,
+        error: {
+          message: "User not found",
+          code: "user_not_found",
+        },
+      };
+    }
+
+    const isValidPassword = await comparePasswordToHashedPassword(currentPassword, user.password);
+
+    if (!isValidPassword) {
+      return {
+        user: null,
+        error: {
+          message: "Invalid current password",
+          code: "invalid_current_password",
+        },
+      };
+    }
+
+    const hashedPassword = await hashUserPassword(newPassword);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: new ObjectId(user._id) },
+      { $set: { password: hashedPassword } },
+      { returnDocument: "after" }
+    );
+
+    if (!updatedUser) {
+      return {
+        user: null,
+        error: {
+          message: "User not found",
+          code: "user_not_found",
+        },
+      };
+    }
+
+    return {
+      error: null,
+      user: {
+        id: updatedUser._id.toHexString(),
+        avatar: updatedUser.avatar,
+        email: updatedUser.email,
+        fullName: updatedUser.fullName,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        emailVerified: updatedUser.emailVerified,
+        roles: updatedUser.roles,
+      },
+    };
+  }
+
   async function deletePasswordResetToken(token: string) {
     const { Verification } = await db();
     const verificationRequest = await Verification.findOne({ token, type: "password_reset" });
@@ -331,6 +397,7 @@ export function MongoDBAdapter(
     registerUser,
     getUserByEmail,
     resetUserPassword,
+    changeUserPassword,
     deletePasswordResetToken,
     generatePasswordResetToken,
     validatePasswordResetToken,
