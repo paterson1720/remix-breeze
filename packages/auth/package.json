@@ -39,7 +39,6 @@
   },
   "gitHead": "54ff60e506e5e97ccae67662f4a574dd13213fb3",
   "dependencies": {
-    "@remix-breeze/auth": "^1.3.3",
     "bcryptjs": "^2.4.3"
   }
 }
