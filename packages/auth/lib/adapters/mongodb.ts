@@ -31,8 +31,9 @@ export function MongoDBAdapter(
   }
 
   function validatePassword(password: string) {
-    // must contain letters and numbers and be at least 6 characters long
-    return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(password);
+    // must contain letters and numbers and be at least 6 characters long, but not limited to only numbers and letters
+    // Example Password@123 or 123Password.com are valid but 123456 is not, can contain any special character
+    return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{6,}$/.test(password);
   }
 
   async function registerUser(request: Request) {

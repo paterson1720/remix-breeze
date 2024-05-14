@@ -3,7 +3,7 @@
 const { program } = require("commander");
 const path = require("path");
 const fs = require("fs");
-const { detect } = require("@antfu/ni");
+const { getPackageManager } = require("./commands/utils");
 
 program
   .command("scaffold <type>")
@@ -72,13 +72,3 @@ program
   });
 
 program.parse(process.argv);
-
-async function getPackageManager(targetDir) {
-  const packageManager = await detect({ programmatic: true, cwd: targetDir });
-
-  if (packageManager === "yarn@berry") return "yarn";
-  if (packageManager === "pnpm@6") return "pnpm";
-  if (packageManager === "bun") return "bun";
-
-  return packageManager ?? "npm";
-}
