@@ -23,7 +23,7 @@ If you are starting a new Remix project, the easiest way is to use the [Remix-Br
 
 ## Existing project ?
 
-If you have an existing project and you want to add authentication to it, following this tutorial to add a full authentication flow to your app. This tutorial assumes your app is using Prisma ORM and Tailwindcss. If you are not using Prisma, you can still follow along, but you'll need to [configure your own adapter](#advanced-usage-custom-database-adapter).
+If you have an existing project and you want to add authentication to it, following this tutorial to add a full authentication flow to your app. This tutorial assumes your app is using Prisma ORM and Tailwindcss. If you are not using Prisma, you can still follow along, but you'll need to [provide a custom database adapter](#provide-a-custom-database-adapter).
 
 - Install the library in your Remix app
 
