@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { normalizeRessourceName } = require("./utils");
+const { findConfigFile } = require("./find-config-file");
 
 function createService(ressourceName, fields) {
   const { capitalSingularResource, lowerSingularResource } = normalizeRessourceName(ressourceName);
@@ -25,58 +26,59 @@ function createService(ressourceName, fields) {
     );
   }
 
-  const fieldsArray = fields.split(" ");
-  fields = "";
-  for (const field of fieldsArray) {
-    const [name, type] = field.split(":");
-    if (type.includes("?")) {
-      fields += `${name}: ${fieldTypeMap[type]} | null;\n  `;
-    } else {
-      fields += `${name}: ${fieldTypeMap[type]};\n  `;
-    }
-  }
-
-  const serviceContent = `import { prisma } from "prisma/client";
-
-  interface Create${capitalSingularResource}Params {
-    ${fields.trimEnd()}
-    createdAt: Date;
-    updatedAt: Date;
-  }
-  
-  export async function create${capitalSingularResource}(params: Create${capitalSingularResource}Params) {
-    return await prisma.${lowerSingularResource}.create({
-      data: params,
-    });
-  }
-  
-  export async function get${capitalSingularResource}ById(id: string) {
-    return await prisma.${lowerSingularResource}.findUnique({
-      where: { id },
-    });
-  }
-  
-  export async function getAll${capitalSingularResource}() {
-    return await prisma.${lowerSingularResource}.findMany();
-  }
-  
-  export async function update${capitalSingularResource}(id: string, params: Partial<Create${capitalSingularResource}Params>) {
-    return await prisma.${lowerSingularResource}.update({
-      where: { id },
-      data: params,
-    });
-  }
-  
-  export async function delete${capitalSingularResource}(id: string) {
-    return await prisma.${lowerSingularResource}.delete({
-      where: { id },
-    });
-  }
-  `;
-
   return function execute() {
+    const fieldsArray = fields.split(" ");
+    fields = "";
+    for (const field of fieldsArray) {
+      const [name, type] = field.split(":");
+      if (type.includes("?")) {
+        fields += `${name}: ${fieldTypeMap[type]} | null;\n  `;
+      } else {
+        fields += `${name}: ${fieldTypeMap[type]};\n  `;
+      }
+    }
+
+    const serviceContent = `import { prisma } from "prisma/client";
+  
+    interface Create${capitalSingularResource}Params {
+      ${fields.trimEnd()}
+      createdAt: Date;
+      updatedAt: Date;
+    }
+    
+    export async function create${capitalSingularResource}(params: Create${capitalSingularResource}Params) {
+      return await prisma.${lowerSingularResource}.create({
+        data: params,
+      });
+    }
+    
+    export async function get${capitalSingularResource}ById(id: string) {
+      return await prisma.${lowerSingularResource}.findUnique({
+        where: { id },
+      });
+    }
+    
+    export async function getAll${capitalSingularResource}() {
+      return await prisma.${lowerSingularResource}.findMany();
+    }
+    
+    export async function update${capitalSingularResource}(id: string, params: Partial<Create${capitalSingularResource}Params>) {
+      return await prisma.${lowerSingularResource}.update({
+        where: { id },
+        data: params,
+      });
+    }
+    
+    export async function delete${capitalSingularResource}(id: string) {
+      return await prisma.${lowerSingularResource}.delete({
+        where: { id },
+      });
+    }
+    `;
+
+    const servicesFolderPath = findConfigFile("app", "services");
     fs.writeFileSync(
-      path.join("app", "services", `${lowerSingularResource}.service.ts`),
+      path.join(servicesFolderPath, `${lowerSingularResource}.service.ts`),
       serviceContent
     );
   };

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { normalizeRessourceName } = require("./utils");
+const { findConfigFile } = require("./find-config-file");
 
 function createPrismaModel(ressourceName, fieldsString) {
   const { capitalSingularResource } = normalizeRessourceName(ressourceName);
@@ -19,7 +20,8 @@ function createPrismaModel(ressourceName, fieldsString) {
   };
 
   // validate model not yet created
-  const modelsPath = path.join("prisma", "schema.prisma");
+  const modelFolderPath = findConfigFile("prisma");
+  const modelsPath = path.join(modelFolderPath, "schema.prisma");
   const schema = fs.readFileSync(modelsPath, "utf-8");
   if (schema.includes(`model ${capitalSingularResource}`)) {
     throw new Error(
@@ -27,22 +29,21 @@ function createPrismaModel(ressourceName, fieldsString) {
     );
   }
 
-  const fields = {};
-  for (const field of fieldsString.split(" ")) {
-    const [name, type] = field.split(":");
-    fields[name] = type;
-  }
-
-  let model = `model ${capitalSingularResource} {\n  id String @id @default(cuid())\n`;
-
-  for (const field in fields) {
-    model += `  ${field} ${typeMap[fields[field]]}\n`;
-  }
-  model += "  createdAt DateTime @default(now())\n";
-  model += "  updatedAt DateTime @updatedAt\n";
-  model += "}";
-
   return function execute() {
+    const fields = {};
+    for (const field of fieldsString.split(" ")) {
+      const [name, type] = field.split(":");
+      fields[name] = type;
+    }
+
+    let model = `model ${capitalSingularResource} {\n  id String @id @default(cuid())\n`;
+
+    for (const field in fields) {
+      model += `  ${field} ${typeMap[fields[field]]}\n`;
+    }
+    model += "  createdAt DateTime @default(now())\n";
+    model += "  updatedAt DateTime @updatedAt\n";
+    model += "}";
     fs.writeFileSync(modelsPath, schema + "\n" + model);
   };
 }

@@ -3,12 +3,10 @@ const path = require("path");
 
 function findConfigFile(...args) {
   const rel = path.join.apply(null, [].slice.call(args));
-  console.log({ rel });
   return findStartingWith(process.cwd(), rel);
 }
 
 function findStartingWith(start, rel) {
-  console.log({ start, rel });
   const file = path.join(start, rel);
   try {
     fs.statSync(file);

@@ -51,6 +51,10 @@ async function createRoutes({ ressourceName, folder, options, modelFieldsObject 
   ];
 
   const routesConfigFilePath = findConfigFile("app", "breeze.routes.config.js");
+  if (!routesConfigFilePath) {
+    throw new Error("Routes config 'app/breeze.routes.config.js' file not found");
+  }
+
   const routesConfig = (await import(routesConfigFilePath)).default;
 
   // check if the routes already exist
@@ -73,38 +77,39 @@ async function createRoutes({ ressourceName, folder, options, modelFieldsObject 
   }
 
   // validate routes config file exists
-  if (!fs.existsSync("app/breeze.routes.config.js")) {
+  if (!fs.existsSync(routesConfigFilePath)) {
     throw new Error(
       "Routes config file 'app/breeze.routes.config.js' not found. Please create one first before running this command."
     );
   }
 
-  // create the files in the pages directory
-  for (const route of routes) {
-    const { file } = route;
-    const directories = path.join("app", ...file.split("/").slice(0, -1));
-    fs.mkdirSync(directories, { recursive: true });
-    fs.writeFileSync(path.join("app", file), route.content);
-  }
-
-  // add the routes to the routesConfig
-  for (const route of routes) {
-    const { path, file } = route;
-    if (options.parentRoute) {
-      const parent = routesConfig.find((r) => r.path === options.parentRoute);
-      if (!parent) {
-        throw new Error(`Parent route ${options.parentRoute} not found`);
-      }
-      parent.children = parent.children || [];
-      parent.children.push({ path, file });
-    } else {
-      routesConfig.push({ path, file });
-    }
-  }
-
   return function execute() {
+    // create the files in the pages directory
+    const appDir = findConfigFile("app");
+    for (const route of routes) {
+      const { file } = route;
+      const directories = path.join(appDir, ...file.split("/").slice(0, -1));
+      fs.mkdirSync(directories, { recursive: true });
+      fs.writeFileSync(path.join(appDir, file), route.content);
+    }
+
+    // add the routes to the routesConfig
+    for (const route of routes) {
+      const { path, file } = route;
+      if (options.parentRoute) {
+        const parent = routesConfig.find((r) => r.path === options.parentRoute);
+        if (!parent) {
+          throw new Error(`Parent route ${options.parentRoute} not found`);
+        }
+        parent.children = parent.children || [];
+        parent.children.push({ path, file });
+      } else {
+        routesConfig.push({ path, file });
+      }
+    }
+
     fs.writeFileSync(
-      "app/breeze.routes.config.js",
+      routesConfigFilePath,
       `/** @type {import("app/lib/remix-breeze-router/types").RouteConfig[]} */
      export default ${JSON.stringify(routesConfig, null, 2)}`
     );
