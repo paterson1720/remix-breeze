@@ -12,8 +12,10 @@ function MongoDBAdapter(getClient) {
         const client = await getClient();
         const db = client.db();
         return {
-            User: db.collection("users"),
-            Verification: db.collection("verifications"),
+            User: db.collection("User"),
+            Verification: db.collection("VerificationRequest"),
+            Role: db.collection("Role"),
+            UserRole: db.collection("UserRole"),
         };
     }
     async function hashUserPassword(password) {
@@ -30,6 +32,15 @@ function MongoDBAdapter(getClient) {
         // must contain letters and numbers and be at least 6 characters long, but not limited to only numbers and letters
         // Example Password@123 or 123Password.com are valid but 123456 is not, can contain any special character
         return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{6,}$/.test(password);
+    }
+    async function getUserRoles(userId) {
+        const objectId = new mongodb_1.ObjectId(userId);
+        const { UserRole, Role } = await db();
+        const userRoles = await UserRole.find({ userId: objectId }).toArray();
+        const roles = await Role.find({
+            _id: { $in: userRoles.map((userRole) => userRole.roleId) },
+        }).toArray();
+        return roles.map((role) => role.name);
     }
     async function registerUser(request) {
         const formData = await request.formData();
@@ -71,7 +82,7 @@ function MongoDBAdapter(getClient) {
                 },
             };
         }
-        const { User } = await db();
+        const { User, Role, UserRole } = await db();
         const normalizedEmail = userData.email.trim().toLowerCase();
         const userExists = await User.findOne({ email: normalizedEmail });
         if (userExists) {
@@ -80,6 +91,16 @@ function MongoDBAdapter(getClient) {
                 error: {
                     message: "A user with this email already exists",
                     code: "user_already_exists",
+                },
+            };
+        }
+        const userRole = await Role.findOne({ name: "user" });
+        if (!userRole) {
+            return {
+                user: null,
+                error: {
+                    message: "Role 'user' not found in the Role collection",
+                    code: "role_not_found",
                 },
             };
         }
@@ -94,7 +115,12 @@ function MongoDBAdapter(getClient) {
             updatedAt: new Date(),
             avatar: "",
             emailVerified: false,
-            roles: ["user"],
+        });
+        await UserRole.insertOne({
+            userId: user.insertedId,
+            roleId: userRole._id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
         return {
             error: null,
@@ -143,7 +169,7 @@ function MongoDBAdapter(getClient) {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 emailVerified: user.emailVerified,
-                roles: user.roles,
+                roles: await getUserRoles(user._id.toHexString()),
             },
         };
     }
@@ -169,7 +195,7 @@ function MongoDBAdapter(getClient) {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 emailVerified: user.emailVerified,
-                roles: user.roles,
+                roles: await getUserRoles(user._id.toHexString()),
             },
         };
     }
@@ -258,7 +284,7 @@ function MongoDBAdapter(getClient) {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 emailVerified: user.emailVerified,
-                roles: user.roles,
+                roles: await getUserRoles(user._id.toHexString()),
             },
         };
     }
@@ -305,7 +331,7 @@ function MongoDBAdapter(getClient) {
                 firstName: updatedUser.firstName,
                 lastName: updatedUser.lastName,
                 emailVerified: updatedUser.emailVerified,
-                roles: updatedUser.roles,
+                roles: await getUserRoles(updatedUser._id.toHexString()),
             },
         };
     }
