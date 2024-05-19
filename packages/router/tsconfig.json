@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+      "lib": ["DOM", "DOM.Iterable", "ES2022"],
+      "esModuleInterop": true,
+      "moduleResolution": "Node",
+      "module": "CommonJS",
+      "target": "ES2022",
+      "strict": true,
+      "skipLibCheck": true,
+      "declaration": true,
+      "jsx": "react-jsx",
+      "outDir": "./build"
+    },
+    "exclude": ["node_modules"],
+    "include": ["lib/**/*.ts", "lib/**/*.tsx", "jest.d.ts"]
+  }
+  
