@@ -34,7 +34,7 @@ function getCreateMarkup({ ressourceName, parent, modelFieldsObject }) {
     export default function Create${capitalSingularResource}() {
       return (
         <section className="w-full">
-          <div className="w-full mx-auto px-4 md:px-6 flex flex-col items-center space-y-4">
+          <div className="w-full px-4 md:px-6 flex flex-col space-y-4">
             <div className="text-center space-y-4">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Create ${lowerSingularResource}</h1>
               <p className="text-gray-500 md:text-xl dark:text-gray-400">Create a new ${singularResource}.</p>
@@ -95,7 +95,7 @@ function getCreateMarkup({ ressourceName, parent, modelFieldsObject }) {
                   })
                   .join("\n")}    
                 <div className="w-full flex flex-col gap-1">
-                  <button type="submit" className="btn btn-primary">
+                  <button type="submit" className="border p-2 rounded-md">
                     Create
                   </button>
                 </div>

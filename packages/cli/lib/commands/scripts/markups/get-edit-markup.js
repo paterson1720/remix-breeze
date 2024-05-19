@@ -42,7 +42,7 @@ function getEditMarkup({ ressourceName, parent, modelFieldsObject }) {
     
       return (
         <section className="w-full">
-          <div className="w-full mx-auto px-4 md:px-6 flex flex-col items-center space-y-4">
+          <div className="w-full px-4 md:px-6 flex flex-col space-y-4">
             <div className="text-center space-y-4">
               <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl">Edit ${capitalSingularResource}</h1>
             </div>

@@ -9,7 +9,7 @@ const command = new Command("scaffold-crud")
   .alias("g-crud")
   .addHelpText(
     "after",
-    `Example: @remix-breeze/cli scaffold crud posts --fields title:string, content:text`
+    `Example: @remix-breeze/cli scaffold crud -r posts -f title:string, content:text`
   )
   .description("Scaffold CRUD for a ressource")
   .option("-r, --ressource <ressource>", "Ressource name")

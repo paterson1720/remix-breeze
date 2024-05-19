@@ -35,7 +35,7 @@ function getShowMarkup({ ressourceName, parent }) {
             <Link to="${parent}${ressourceName}">Back to list</Link>&nbsp;|&nbsp;
             <Link to={\`${parent}${ressourceName}/\${loaderData.data.id}/edit\`}>Edit</Link>
           </div>
-          <div className="bg-white shadow-lg rounded-lg p-4 border">
+          <div className="shadow-lg rounded-lg p-4 border">
             <pre>
               <code>{JSON.stringify(loaderData.data, null, 2)}</code>
             </pre>

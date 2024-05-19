@@ -40,7 +40,7 @@ function getListMarkup({ ressourceName, parent }) {
   
           <div className="w-full flex flex-col gap-4">
             {loaderData.data.map((item) => (
-              <div key={item.id} className="bg-white shadow-lg rounded-lg p-4 border">
+              <div key={item.id} className="shadow-lg rounded-lg p-4 border">
                 <pre>
                   <code>{JSON.stringify(item, null, 2)}</code>
                 </pre>
