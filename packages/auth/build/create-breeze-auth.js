@@ -290,16 +290,12 @@ function createBreezeAuth(breezeAuthOptions) {
         async requireAuth(request, options) {
             const session = await this.getSession(request);
             const sessionUser = session.get("user");
-            const isCustomSessionStorage = "sessionStorage" in breezeAuthOptions;
-            if (!sessionUser && !isCustomSessionStorage) {
+            if (!sessionUser) {
                 throw (0, node_1.redirect)(options.ifNotAuthenticatedRedirectTo, {
                     headers: {
                         "Set-Cookie": await sessionStorage.destroySession(session),
                     },
                 });
-            }
-            else if (!sessionUser) {
-                throw (0, node_1.redirect)(options.ifNotAuthenticatedRedirectTo);
             }
             if (options.withRoles?.length) {
                 for (const role of options.withRoles) {
@@ -742,7 +738,6 @@ function createBreezeAuth(breezeAuthOptions) {
                 }
             }
             const { user, error } = await dbAdapter.loginUser(credentials);
-            const session = await this.getSession(request);
             if (error) {
                 return (0, node_1.json)({
                     error: {
@@ -751,6 +746,7 @@ function createBreezeAuth(breezeAuthOptions) {
                     },
                 });
             }
+            const session = await this.getSession(request);
             session.set("user", user);
             session.set("metadata", { userAgent: String(request.headers.get("User-Agent")) });
             return (0, node_1.redirect)(options.redirectTo, {

@@ -151,7 +151,7 @@ Say you define a route like this in your routeConfig array:
  }
 ```
 
-If you want to link to it in your UI, you get do something like this:
+If you want to link to it in your UI, you can do something like this:
 
 ```tsx
 <Link
