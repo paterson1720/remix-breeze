@@ -1,0 +1,36 @@
+{
+  "name": "@remix-breeze/toast",
+  "version": "1.3.10",
+  "description": "A simple server-side toast notification library for Remix",
+  "author": "paterson1720 <paterson.anaccius@technologeek.ca>",
+  "homepage": "",
+  "license": "MIT",
+  "keywords": [
+    "Remix",
+    "toast",
+    "toast notification",
+    "notification",
+    "remix-toast-notification",
+    "remix-toast",
+    "remix-breeze",
+    "remix-run"
+  ],
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "directories": {
+    "lib": "lib",
+    "build": "build",
+    "test": "__tests__"
+  },
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-paterson1720:paterson1720/remix-breeze.git"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "node ./__tests__/toast.test.js"
+  }
+}
