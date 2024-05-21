@@ -54,10 +54,10 @@ export async function action({ params }: ActionFunctionArgs) {
   try {
     await deletePost(params.id);
     const headers = await breezeToast.success("Post deleted successfully");
-    return json({ success: true }, { headers });
+    return redirect("/posts", { headers });
   } catch (error) {
     const headers = await breezeToast.error("An error occurred while deleting the post");
-    return json({ success: false }, { headers });
+    return redirect("/posts", { headers });
   }
 }
 ```
@@ -246,7 +246,7 @@ Adds a flash toast object to the toast session with type `success` and the speci
 export async function action({ params }: ActionFunctionArgs) {
   await deletePost(params.id);
   const headers = await breezeToast.success("Post deleted successfully");
-  return json({ message: "Success" }, { headers });
+  return redirect("/posts", { headers });
 }
 ```
 
@@ -269,10 +269,10 @@ export async function action({ params }: ActionFunctionArgs) {
   try {
     await deletePost(params.id);
     const headers = await breezeToast.success("Post deleted successfully");
-    return json({ message: "Success" }, { headers });
+    return redirect("/posts", { headers });
   } catch (error) {
     const headers = await breezeToast.error("An error occurred while deleting the post");
-    return json({ message: "Error" }, { headers });
+    return redirect("/posts", { headers });
   }
 }
 ```
@@ -295,7 +295,7 @@ Adds a flash toast object to the toast session with type `info` and the specifie
 export async function action({ params }: ActionFunctionArgs) {
   await deletePost(params.id);
   const headers = await breezeToast.info("Some info message");
-  return json({ message: "Success" }, { headers });
+  return redirect("/posts", { headers });
 }
 ```
 
@@ -317,7 +317,7 @@ Adds a flash toast object to the toast session with type `warning` and the speci
 export async function action({ params }: ActionFunctionArgs) {
   await deletePost(params.id);
   const headers = await breezeToast.warning("Some warning message");
-  return json({ message: "Success" }, { headers });
+  return redirect("/posts", { headers });
 }
 ```
 

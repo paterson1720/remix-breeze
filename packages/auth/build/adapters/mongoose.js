@@ -31,15 +31,6 @@ function MongooseAdapter(getClient) {
         // Example Password@123 or 123Password.com are valid but 123456 is not, can contain any special character
         return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{6,}$/.test(password);
     }
-    // async function getUserRoles(userId: string) {
-    //   const objectId = new ObjectId(userId);
-    //   const { UserRole, Role } = await db();
-    //   const userRoles = await UserRole.find({ userId: objectId }).toArray();
-    //   const roles = await Role.find({
-    //     _id: { $in: userRoles.map((userRole) => userRole.roleId) },
-    //   }).toArray();
-    //   return roles.map((role) => role.name);
-    // }
     async function registerUser(request) {
         const formData = await request.formData();
         const formEntries = Object.fromEntries(formData.entries());

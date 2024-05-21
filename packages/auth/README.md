@@ -19,7 +19,7 @@ Choose one of the options below to get started.
 
 ## Starting a new Remix project ?
 
-If you are starting a new Remix project, the easiest way is to use the [Remix-Breeze Starter Template](https://github.com/paterson1720/remix-breeze-starter). It's a simple and easy to use starter template built to get your project started quickly with **@remix-breeze/auth** and Remix.
+If you are starting a new Remix project, the easiest way is to use the [create-remix-breeze](https://github.com/paterson1720/new-remix-breeze-app) to create a new Remix-Breeze app. When you create a Remix-Breeze app you have a full authentication flow out of the box already implemented for you using **@remix-breeze/auth** and Remix.
 
 ## Existing project ?
 
