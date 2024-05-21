@@ -23,6 +23,8 @@ program
       execSync("npx prisma generate", { cwd: projectPath, stdio: "inherit" });
       console.info("Seeding the database...");
       execSync("npx prisma db seed", { cwd: projectPath, stdio: "inherit" });
+      execSync("rm -rf .git", { cwd: projectPath, stdio: "inherit" });
+      execSync("git init", { cwd: projectPath, stdio: "inherit" });
       console.info("---------------------------------");
       console.info("✅ Project is ready! 🚀");
       console.info("---------------------------------");
