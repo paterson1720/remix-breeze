@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const program = require("commander");
 const { execSync } = require("child_process");
 const path = require("path");
@@ -14,7 +15,8 @@ program
     gitClone(repoUrl, projectPath, null, function () {
       console.log("Installing dependencies...");
       execSync("npm install", { cwd: projectPath, stdio: "inherit" });
-      console.log("Project is ready!");
+      execSync("cp .env.example .env", { cwd: projectPath, stdio: "inherit" });
+      console.log("✅ Project is ready!");
     });
   })
   .parse(process.argv);

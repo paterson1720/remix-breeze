@@ -12,7 +12,10 @@
   "author": "paterson1720 <lesage1720@gmail.com>",
   "homepage": "",
   "license": "ISC",
-  "main": "lib/create-remix-breeze.js",
+  "main": "lib/index.js",
+  "bin": {
+    "create-remix-breeze": "lib/cli.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "__tests__"
