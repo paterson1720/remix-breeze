@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-const program = require("commander");
+const { Command } = require("commander");
 const { execSync } = require("child_process");
 const path = require("path");
 const { gitClone } = require("./util");
+
+const program = new Command("create-remix-breeze");
 
 program
   .argument("<project-name>")
