@@ -128,9 +128,7 @@ async function loader({ request }: LoaderFunctionArgs) {
 export function App() {
   const loaderData = useLoaderData<typeof loader>();
 
-  {
-    /* Using useEffect to show the toast notification */
-  }
+  /* Using useEffect to show the toast notification */
   React.useEffect(() => {
     if (loaderData.toastData) {
       const { type, message } = loaderData.toastData;
@@ -393,6 +391,5 @@ async function loader({ request }: LoaderFunctionArgs) {
   return toast.getWithJson(request, { message: "Hello World" });
 }
 ```
-
 
 The session storage object with methods `getSession`, `commitSession`, and `destroySession`. You'll rarely need to use this unless you want to manually manipulate the toast cookie session.

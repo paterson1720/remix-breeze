@@ -1,14 +1,23 @@
 import { DefineRouteCallback, DefineRouteFunction, GetPathOption, RouteConfig } from "./types";
 
-export function createBreezeRouter(options: { routes: RouteConfig[] }) {
+// Utility type to extract route names, ensuring children is always checked
+type ExtractRouteNames<T extends RouteConfig[]> = {
+  [K in keyof T]: T[K] extends { name: infer N; children?: RouteConfig[] }
+    ? N | ExtractRouteNames<NonNullable<T[K]["children"]>>
+    : never;
+}[number];
+
+export function createBreezeRouter<T extends RouteConfig[]>(options: { routes: T }) {
+  type RouteNames = ExtractRouteNames<T>;
+
   function init(defineRoutes: DefineRouteCallback) {
     return defineRoutes(getDefineRoutesCallback(options.routes));
   }
   function routes(defineRoutes: DefineRouteCallback) {
     return init(defineRoutes);
   }
-  function getPath(name: string, _options: GetPathOption = {}) {
-    return getRoutePath(name, options.routes, _options);
+  function getPath(name: RouteNames, _options: GetPathOption = {}) {
+    return getRoutePath(name as string, options.routes, _options);
   }
   return {
     /**

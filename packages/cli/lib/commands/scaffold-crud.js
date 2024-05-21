@@ -3,6 +3,7 @@ const { createPrismaModel } = require("./scripts/create-model");
 const { createService } = require("./scripts/create-service");
 
 const { Command } = require("commander");
+const { singularize, capitalize } = require("./scripts/utils");
 
 const command = new Command("scaffold-crud")
   .alias("s-crud")
@@ -77,6 +78,39 @@ const command = new Command("scaffold-crud")
       executeCreateModel();
       executeCreateService();
     }
+
+    let parentRoute = options.parentRoute;
+    if (!parentRoute) {
+      parentRoute = "/";
+    } else {
+      parentRoute = parentRoute.replace(/^\/|\/$/g, "");
+      parentRoute = `/${parentRoute}/`;
+    }
+
+    console.info("\n\n✅ CRUD scaffolded successfully!\n");
+    console.info("---------------------------------------------------------------");
+    console.info("👉Routes Created and Added to 'app/breeze.routes.config.js' :");
+    console.info("---------------------------------------------------------------");
+    console.info(
+      `✅ ${parentRoute}${ressourceName}\n✅ ${parentRoute}${ressourceName}/create\n✅ ${parentRoute}${ressourceName}/:id\n✅ ${parentRoute}${ressourceName}/:id/edit\n✅ ${parentRoute}${ressourceName}/:id/delete\n`
+    );
+
+    console.info("---------------------------------------------------------------");
+    console.info(
+      `👉Model '${singularize(capitalize(ressourceName))}' added to 'prisma/prisma.schema'`
+    );
+    console.info("👉Service added to 'app/services' folder");
+    console.info(`👉Pages added to 'app/pages' folder`);
+    console.info("---------------------------------------------------------------\n");
+
+    console.info("ℹ️ WHAT TO DO NEXT ?");
+    console.info("-------------------");
+    console.info("🖥️ Run the following command to update your database schema:");
+    console.info(">👉 npx prisma db push");
+    console.info(">👉 npx prisma generate");
+    console.info(
+      `🚀 Restart your Remix server and navigate to '${parentRoute}${ressourceName}' and see magic happens`
+    );
 
     scaffoldCrud(ressourceName, folder);
   });

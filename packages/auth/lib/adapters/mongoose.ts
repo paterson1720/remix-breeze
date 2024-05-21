@@ -3,6 +3,37 @@ import bcrypt from "bcryptjs";
 import { MongoClient, ObjectId } from "mongodb";
 import { BreezeAuthSessionUser, BreezeAuthUser, DatabaseAdapter } from "../types";
 
+// Models Schema
+
+// User Schema
+// const userSchema = new mongoose.Schema<User>(
+//     {
+//       email: { type: String, unique: true, required: true },
+//       emailVerified: { type: Boolean, default: false },
+//       fullName: { type: String, required: true },
+//       firstName: { type: String, required: true },
+//       lastName: { type: String, required: true },
+//       avatar: { type: String },
+//       password: { type: String, required: true },
+//       roles: { type: [String], required: true, default: ["user"] },
+//     },
+//     { timestamps: true }
+//   );
+
+// Verification Schema
+// const verificationRequestSchema = new mongoose.Schema(
+//     {
+//       identifier: { type: String, required: true },
+//       token: { type: String, unique: true, required: true },
+//       type: { type: String, required: true },
+//       expires: { type: Date, required: true },
+//     },
+//     {
+//       timestamps: true,
+//       index: { fields: { identifier: 1, token: 1 }, unique: true },
+//     }
+//   );
+
 type User = Omit<BreezeAuthUser, "id">;
 
 export function MongooseAdapter(
@@ -35,16 +66,6 @@ export function MongooseAdapter(
     // Example Password@123 or 123Password.com are valid but 123456 is not, can contain any special character
     return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d\S]{6,}$/.test(password);
   }
-
-  // async function getUserRoles(userId: string) {
-  //   const objectId = new ObjectId(userId);
-  //   const { UserRole, Role } = await db();
-  //   const userRoles = await UserRole.find({ userId: objectId }).toArray();
-  //   const roles = await Role.find({
-  //     _id: { $in: userRoles.map((userRole) => userRole.roleId) },
-  //   }).toArray();
-  //   return roles.map((role) => role.name);
-  // }
 
   async function registerUser(request: Request) {
     const formData = await request.formData();

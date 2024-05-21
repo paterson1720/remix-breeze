@@ -13,7 +13,7 @@ export interface RouteConfig {
   path: string;
   file: string;
   options?: DefineRouteOptions;
-  children?: RouteConfig[];
+  children?: RouteConfig[]
 }
 
 /**

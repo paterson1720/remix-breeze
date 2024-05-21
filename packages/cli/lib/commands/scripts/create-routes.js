@@ -110,7 +110,7 @@ async function createRoutes({ ressourceName, folder, options, modelFieldsObject 
 
     fs.writeFileSync(
       routesConfigFilePath,
-      `/** @type {import("app/lib/remix-breeze-router/types").RouteConfig[]} */
+      `/** @type {import("@remix-breeze/router").RouteConfig[]} */
      export default ${JSON.stringify(routesConfig, null, 2)}`
     );
   };

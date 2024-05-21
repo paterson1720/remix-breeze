@@ -1,0 +1,30 @@
+{
+  "name": "create-remix-breeze",
+  "version": "1.3.13",
+  "description": "Initialize a new Remix-Breeze app",
+  "keywords": [
+    "remix",
+    "remix-breeze",
+    "javascript",
+    "typescript",
+    "react"
+  ],
+  "author": "paterson1720 <lesage1720@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/create-remix-breeze.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-paterson1720:paterson1720/remix-breeze.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/create-remix-breeze.test.js"
+  }
+}
