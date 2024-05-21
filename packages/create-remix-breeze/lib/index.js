@@ -21,7 +21,20 @@ program
       execSync("cp .env.example .env", { cwd: projectPath, stdio: "inherit" });
       execSync("npx prisma db push", { cwd: projectPath, stdio: "inherit" });
       execSync("npx prisma generate", { cwd: projectPath, stdio: "inherit" });
-      console.info("✅ Project is ready!");
+      console.info("Seeding the database...");
+      execSync("npx prisma db seed", { cwd: projectPath, stdio: "inherit" });
+      console.info("---------------------------------");
+      console.info("✅ Project is ready! 🚀");
+      console.info("---------------------------------");
+      console.info("👉 Change directory to your project by running: cd " + projectName);
+      console.info("👉 Start the server by running: npm run dev");
+      console.info("---------------------------------");
+      console.log("Test user credentials");
+      console.info("---------------------------------");
+      console.log("Test email   : test@user.com");
+      console.log("Test password: Password@123");
+      console.info("---------------------------------");
+      console.log("Happy Breeze-Remixing! 🎉");
     });
   })
   .parse(process.argv);
