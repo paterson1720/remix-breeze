@@ -6,7 +6,7 @@ const path = require("path");
 const { gitClone } = require("./util");
 
 program
-  .arguments("<project-name>")
+  .argument("<project-name>")
   .action(function (projectName) {
     const projectPath = path.join(process.cwd(), projectName);
     const repoUrl = "https://github.com/paterson1720/new-remix-breeze-app";
