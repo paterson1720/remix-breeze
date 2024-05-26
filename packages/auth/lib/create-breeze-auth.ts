@@ -716,6 +716,81 @@ export function createBreezeAuth<T extends BreezeAuthSessionUser>(
       redirectTo.searchParams.set("email", encodeURIComponent(email));
       return redirect(redirectTo.toString());
     },
+
+    async sendEmailVerificationLink(
+      request: Request,
+      options: {
+        onSuccessRedirectTo: string;
+        expireLinkAfterMinutes: number;
+      }
+    ) {
+      const providerConfig = providers.find((provider) => provider.type === "credentials");
+
+      if (!providerConfig) {
+        throw new Error(`BreezeAuth: No credentials provider found in the configuration`);
+      }
+
+      const session = await this.getSession(request);
+      const sessionUser = session.get("user");
+
+      if (!sessionUser) {
+        throw new Error(
+          "BreezeAuth: User is not authenticated. Cannot send email verification link."
+        );
+      }
+
+      const { sendEmailVerificationEmail, emailVerificationPageUrl } = providerConfig;
+      if (!emailVerificationPageUrl || !sendEmailVerificationEmail) {
+        throw new Error(
+          `BreezeAuth: "emailVerificationPageUrl" and "sendEmailVerificationEmail" are required in the credentials provider configuration to be able to use the sendEmailVerificationLink function.`
+        );
+      }
+
+      const generateTokenResult = await dbAdapter.generateEmailVerificationToken(
+        sessionUser.email,
+        {
+          expiresAfterMinutes: options.expireLinkAfterMinutes,
+        }
+      );
+
+      if (generateTokenResult.error) {
+        return json({
+          error: {
+            message: generateTokenResult.error.message,
+            code: generateTokenResult.error.code,
+          },
+        });
+      }
+
+      const verificationToken = generateTokenResult.token;
+      const uriEncodedEmail = encodeURIComponent(sessionUser.email);
+      const verificationLink = `${emailVerificationPageUrl}?token=${verificationToken}&email=${uriEncodedEmail}`;
+
+      const sendMailResult = await sendEmailVerificationEmail({
+        verificationLink,
+        user: {
+          id: sessionUser.id,
+          email: sessionUser.email,
+          firstName: sessionUser.firstName,
+          lastName: sessionUser.lastName,
+        },
+      });
+
+      if (sendMailResult.error) {
+        return json({
+          error: {
+            message: sendMailResult.error.message,
+            code: sendMailResult.error.code,
+          },
+        });
+      }
+
+      const requestUrl = new URL(request.url);
+      const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
+      const redirectTo = new URL(options.onSuccessRedirectTo, baseUrl);
+      redirectTo.searchParams.set("email", encodeURIComponent(sessionUser.email));
+      return redirect(redirectTo.toString());
+    },
     /**
      * -----------------------------------------
      * redirectIfAuthenticated

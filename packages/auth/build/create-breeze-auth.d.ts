@@ -384,6 +384,15 @@ export declare function createBreezeAuth<T extends BreezeAuthSessionUser>(breeze
             code: string;
         };
     }>;
+    sendEmailVerificationLink(request: Request, options: {
+        onSuccessRedirectTo: string;
+        expireLinkAfterMinutes: number;
+    }): Promise<import("@remix-run/node").TypedResponse<{
+        error: {
+            message: string;
+            code: string;
+        };
+    }>>;
     /**
      * -----------------------------------------
      * redirectIfAuthenticated

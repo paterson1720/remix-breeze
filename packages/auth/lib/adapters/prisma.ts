@@ -360,6 +360,38 @@ export function PrismaAdapter(
         token,
       };
     },
+    async generateEmailVerificationToken(email, options: { expiresAfterMinutes: number }) {
+      const token = crypto.randomBytes(32).toString("hex");
+
+      const existingRequest = await prisma.verificationRequest.findFirst({
+        where: {
+          identifier: email,
+          type: "email_verification",
+        },
+      });
+
+      if (existingRequest) {
+        await prisma.verificationRequest.delete({
+          where: {
+            id: existingRequest.id,
+          },
+        });
+      }
+
+      await prisma.verificationRequest.create({
+        data: {
+          token,
+          identifier: email,
+          type: "email_verification",
+          expires: new Date(Date.now() + options.expiresAfterMinutes * 60 * 1000),
+        },
+      });
+
+      return {
+        error: null,
+        token,
+      };
+    },
     async validatePasswordResetToken(token) {
       const verificationRequest = await prisma.verificationRequest.findFirst({
         where: {

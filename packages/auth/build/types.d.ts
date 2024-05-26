@@ -136,6 +136,13 @@ export interface BreezeAuthProvider {
      */
     resetPasswordPageUrl?: string;
     /**
+     * The URL to your email verification page. This is used to redirect the user to the email verification page
+     * when they click the email verification link in the email verification email.
+     *
+     * Example: /auth/verify-email
+     */
+    emailVerificationPageUrl?: string;
+    /**
      * A function that sends a password reset email to the user.
      * @param options - The options object containing the user's email and the password reset link.
      * @param options.user - The user object containing the user's id and email.
@@ -150,6 +157,28 @@ export interface BreezeAuthProvider {
             lastName?: string;
         };
         resetLink: string;
+    }) => Promise<{
+        error: {
+            message: string;
+            code: string;
+            meta?: object;
+        } | null;
+    }>;
+    /**
+     * A function that sends an email verification email to the user.
+     * @param options - The options object containing the user's email and the email verification link.
+     * @param options.user - The user object containing the user's id and email.
+     * @param options.verificationLink - The email verification link that the user can click to verify their email.
+     * @returns An object containing an error flag and an optional message.
+     */
+    sendEmailVerificationEmail?: (options: {
+        user: {
+            id: string;
+            email: string;
+            firstName?: string;
+            lastName?: string;
+        };
+        verificationLink: string;
     }) => Promise<{
         error: {
             message: string;
@@ -211,6 +240,9 @@ export interface DatabaseAdapter<T> {
      * @returns An object containing the token or an error object with a message and code if an error occurred
      */
     generatePasswordResetToken: (email: string, options: {
+        expiresAfterMinutes: number;
+    }) => Promise<TokenDataSuccess | TokenDataError>;
+    generateEmailVerificationToken: (email: string, options: {
         expiresAfterMinutes: number;
     }) => Promise<TokenDataSuccess | TokenDataError>;
     deletePasswordResetToken: (token: string) => Promise<{

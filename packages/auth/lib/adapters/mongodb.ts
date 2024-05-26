@@ -254,6 +254,33 @@ export function MongoDBAdapter(
     return { error: null, token };
   }
 
+  async function generateEmailVerificationToken(
+    email: string,
+    options: { expiresAfterMinutes: number }
+  ) {
+    const token = crypto.randomBytes(32).toString("hex");
+
+    const { Verification } = await db();
+
+    const existingRequest = await Verification.findOne({
+      identifier: email,
+      type: "email_verification",
+    });
+
+    if (existingRequest) {
+      await Verification.deleteOne({ _id: existingRequest._id });
+    }
+
+    await Verification.insertOne({
+      token,
+      identifier: email,
+      type: "email_verification",
+      expires: new Date(Date.now() + options.expiresAfterMinutes * 60 * 1000),
+    });
+
+    return { error: null, token };
+  }
+
   async function validatePasswordResetToken(token: string) {
     const { Verification } = await db();
     const verificationRequest = await Verification.findOne({
@@ -432,5 +459,6 @@ export function MongoDBAdapter(
     deletePasswordResetToken,
     generatePasswordResetToken,
     validatePasswordResetToken,
+    generateEmailVerificationToken,
   };
 }
