@@ -1,0 +1,38 @@
+{
+  "name": "create-next-breeze",
+  "version": "1.5.0",
+  "description": "Initialize a new Next-Breeze app",
+  "keywords": [
+    "next",
+    "next.js",
+    "nextjs",
+    "next-breeze",
+    "javascript",
+    "typescript",
+    "react"
+  ],
+  "author": "paterson1720 <lesage1720@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "bin": {
+    "create-next-breeze": "lib/index.js"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-paterson1720:paterson1720/remix-breeze.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/create-next-breeze.test.js"
+  },
+  "dependencies": {
+    "commander": "12.0.0"
+  }
+}

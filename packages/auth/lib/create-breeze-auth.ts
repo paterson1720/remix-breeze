@@ -721,6 +721,7 @@ export function createBreezeAuth<T extends BreezeAuthSessionUser>(
       request: Request,
       options: {
         onSuccessRedirectTo: string;
+        onErrorRedirectTo: string;
         expireLinkAfterMinutes: number;
       }
     ) {

@@ -11,7 +11,7 @@ program
   .argument("<project-name>")
   .action(function (projectName) {
     const projectPath = path.join(process.cwd(), projectName);
-    const repoUrl = "https://github.com/paterson1720/new-remix-breeze-app";
+    const repoUrl = "https://github.com/paterson1720/new-next-breeze-app";
 
     console.info(`Creating a new project in ${projectPath}.`);
     gitClone(repoUrl, projectPath, null, function () {
@@ -31,12 +31,8 @@ program
       console.info("👉 Change directory to your project by running: cd " + projectName);
       console.info("👉 Start the server by running: npm run dev");
       console.info("---------------------------------");
-      console.log("Test user credentials");
       console.info("---------------------------------");
-      console.log("Test email   : test@user.com");
-      console.log("Test password: Password@123");
-      console.info("---------------------------------");
-      console.log("Happy Breeze-Remixing! 🎉");
+      console.log("Happy Next-Breezing! 🎉");
     });
   })
   .parse(process.argv);

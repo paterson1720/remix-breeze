@@ -1,6 +1,5 @@
 const { createRoutes } = require("./scripts/create-routes");
 const { createPrismaModel } = require("./scripts/create-model");
-const { createService } = require("./scripts/create-service");
 
 const { Command } = require("commander");
 const { singularize, capitalize } = require("./scripts/utils");
@@ -8,24 +7,16 @@ const { singularize, capitalize } = require("./scripts/utils");
 const command = new Command("scaffold-crud")
   .alias("s-crud")
   .alias("g-crud")
-  .addHelpText(
-    "after",
-    `Example: @remix-breeze/cli scaffold crud -r posts -f title:string, content:text`
-  )
   .description("Scaffold CRUD for a ressource")
   .option("-r, --ressource <ressource>", "Ressource name")
   .option(
     "-f, --folder [folder]",
-    "Folder name where the pages will be created. Default is 'app/pages' folder",
-    "app/pages"
+    "Folder name where the pages will be created. Default is 'app/' folder",
+    "app/"
   )
   .option(
     "-m, --model <model>",
     "Model fields. Example: title:string description:text imageUrl:string?"
-  )
-  .option(
-    "-pr, --parent-route [parentRoute]",
-    "The parent route, if you want this ressource routes to be nested nested. Default is '/'"
   )
   .action(async (options) => {
     if (typeof options.ressource !== "string") {
@@ -44,11 +35,7 @@ const command = new Command("scaffold-crud")
       throw new Error("Folder name should be of type string. Example: -f app/pages/admin");
     }
 
-    if (options.parentRoute && typeof options.parentRoute !== "string") {
-      throw new Error("Parent route should be of type string. Example: -pr /admin");
-    }
-
-    const folder = options.folder || "app/pages";
+    const folder = options.folder || "app/";
     const ressourceName = options.ressource;
 
     const modelFields = options.model;
@@ -64,6 +51,20 @@ const command = new Command("scaffold-crud")
       modelFieldsObject[name] = type;
     });
 
+    let parentRoute = options.folder || "/";
+    if (!parentRoute) {
+      parentRoute = "/";
+    } else {
+      parentRoute = parentRoute.replace(/^\/|\/$/g, "");
+      parentRoute = parentRoute.trim().replace(/^app/, "");
+      const routeParts = parentRoute.split("/").filter((p) => p && !p.includes("("));
+      if (routeParts.length) {
+        parentRoute = `/${routeParts.join("/")}/`;
+      } else {
+        parentRoute = "/";
+      }
+    }
+
     async function scaffoldCrud(ressourceName, folder) {
       const executeCreateRoutes = await createRoutes({
         ressourceName,
@@ -72,23 +73,13 @@ const command = new Command("scaffold-crud")
         modelFieldsObject,
       });
       const executeCreateModel = createPrismaModel(ressourceName, modelFields);
-      const executeCreateService = createService(ressourceName, modelFields);
 
       executeCreateRoutes();
       executeCreateModel();
-      executeCreateService();
-
-      let parentRoute = options.parentRoute;
-      if (!parentRoute) {
-        parentRoute = "/";
-      } else {
-        parentRoute = parentRoute.replace(/^\/|\/$/g, "");
-        parentRoute = `/${parentRoute}/`;
-      }
 
       console.info("\n\n✅ CRUD scaffolded successfully!\n");
       console.info("---------------------------------------------------------------");
-      console.info("👉Routes Created and Added to 'app/breeze.routes.config.js' :");
+      console.info("👉Routes Created and Added to 'app/' :");
       console.info("---------------------------------------------------------------");
       console.info(
         `✅ ${parentRoute}${ressourceName}\n✅ ${parentRoute}${ressourceName}/create\n✅ ${parentRoute}${ressourceName}/:id\n✅ ${parentRoute}${ressourceName}/:id/edit\n✅ ${parentRoute}${ressourceName}/:id/delete\n`
@@ -96,10 +87,9 @@ const command = new Command("scaffold-crud")
 
       console.info("---------------------------------------------------------------");
       console.info(
-        `👉Model '${singularize(capitalize(ressourceName))}' added to 'prisma/prisma.schema'`
+        `👉Model '${singularize(capitalize(ressourceName))}' added to 'prisma/schema.prisma'`
       );
-      console.info("👉Service added to 'app/services' folder");
-      console.info(`👉Pages added to 'app/pages' folder`);
+      console.info("👉Server Actions added to 'actions/' folder");
       console.info("---------------------------------------------------------------\n");
 
       console.info("ℹ️ WHAT TO DO NEXT ?");
@@ -108,7 +98,7 @@ const command = new Command("scaffold-crud")
       console.info(">👉 npx prisma db push");
       console.info(">👉 npx prisma generate");
       console.info(
-        `🚀 Restart your Remix server and navigate to '${parentRoute}${ressourceName}' and see magic happens`
+        `🚀 Restart your server and navigate to '${parentRoute}${ressourceName}' and see magic happens`
       );
     }
 
