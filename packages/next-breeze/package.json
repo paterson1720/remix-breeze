@@ -32,6 +32,7 @@
     "test": "node ./__tests__/next-breeze.test.js"
   },
   "dependencies": {
+    "@antfu/ni": "^0.21.12",
     "commander": "^12.1.0"
   }
 }
