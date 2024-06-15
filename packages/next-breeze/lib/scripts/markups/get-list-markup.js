@@ -11,20 +11,26 @@ function getListMarkup({ ressourceName, parent }) {
     const data = await getAll${capitalRessourceName}();
   
     return (
-      <section className="w-full flex flex-col">
-        <div className="w-full max-w-7xl mx-auto gap-3 flex flex-col items-center py-12">
-          <h1 className="text-2xl md:text-4xl font-bold">All ${capitalRessourceName}</h1>
-          <p>A list of all records.</p>
+      <section className="bg-white dark:bg-gray-900">
+      <div className="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+        <div className="mx-auto max-w-screen-sm text-center lg:mb-16 mb-8">
+          <h2 className="mb-4 text-3xl lg:text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">
+            All ${capitalRessourceName}
+          </h2>
+          <p className="font-light text-gray-500 sm:text-xl dark:text-gray-400 mb-4">
+            Here you can view all ${lowerRessourceName} records. Feel free to change the design and layout to fit your needs.
+          </p>
           <Link
             className="text-blue-500 block border p-2 px-4 rounded-md hover:underline"
             href="${parent}${lowerRessourceName}/create"
           >
             Create Record
           </Link>
-          <div className="flex flex-col gap-4">
+        </div>
+        <div className="grid gap-8 lg:grid-cols-2">
             {data.map((item) => (
               <div key={item.id} className="border border-muted rounded-md shadow-md p-4">
-                <pre>{JSON.stringify(item, null, 2)}</pre>
+                <pre className="max-w-5xl overflow-hidden">{JSON.stringify(item, null, 2)}</pre>
                 <div>
                   <Link className="text-blue-500" href={\`${parent}${lowerRessourceName}/\${item.id}\`}>
                     View

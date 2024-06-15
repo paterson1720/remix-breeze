@@ -24,9 +24,8 @@ function createPrismaModel(ressourceName, fieldsString) {
   const modelsPath = path.join(modelFolderPath, "schema.prisma");
   const schema = fs.readFileSync(modelsPath, "utf-8");
   if (schema.includes(`model ${capitalSingularResource}`)) {
-    throw new Error(
-      `A Model for ${capitalSingularResource} already exists in the prisma Schema file. Please delete it first or choose another name.`
-    );
+    const message = `A Model for ${capitalSingularResource} already exists in the prisma Schema file. Skipping model creation.`;
+    return () => console.log(message);
   }
 
   return function execute() {
@@ -42,7 +41,7 @@ function createPrismaModel(ressourceName, fieldsString) {
       model += `  ${field} ${typeMap[fields[field]]}\n`;
     }
     model += "  createdAt DateTime @default(now())\n";
-    model += "  updatedAt DateTime @updatedAt\n";
+    model += "  updatedAt DateTime @updatedAt\n";cod
     model += "}";
     fs.writeFileSync(modelsPath, schema + "\n" + model);
   };

@@ -25,7 +25,7 @@ function getShowMarkup({ ressourceName, parent }) {
           </Link>
           <div className="flex flex-col gap-4">
             <div className="border border-muted rounded-md shadow-md p-4">
-              <pre>{JSON.stringify(data, null, 2)}</pre>
+              <pre className="max-w-5xl overflow-hidden">{JSON.stringify(data, null, 2)}</pre>
               <div>
                 <Link className="text-yellow-500" href={\`${parent}${lowerRessourceName}/\${params.id}/edit\`}>
                   Edit
