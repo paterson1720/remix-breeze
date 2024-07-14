@@ -41,7 +41,7 @@ function createPrismaModel(ressourceName, fieldsString) {
       model += `  ${field} ${typeMap[fields[field]]}\n`;
     }
     model += "  createdAt DateTime @default(now())\n";
-    model += "  updatedAt DateTime @updatedAt\n";cod
+    model += "  updatedAt DateTime @updatedAt\n";
     model += "}";
     fs.writeFileSync(modelsPath, schema + "\n" + model);
   };
